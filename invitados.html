@@ -32,6 +32,13 @@
     .mesa-lista li small { color: #999; }
     .mesa-pie { margin-top: .6rem; font-size: .74rem; color: #888; }
 
+    /* ── Plano del salón ── */
+    .plano-barra {
+        display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        background: #fff; border: 1px solid #e6e6ee; border-radius: 10px;
+        padding: 12px 14px; margin-bottom: 12px;
+    }
+
     /* ── Modal de código QR ── */
     #qrModal {
         display: none; position: fixed; inset: 0; z-index: 9500;
@@ -123,10 +130,23 @@
             </div>
         </section>
         <section class="service-section">
-            <h2><i class="fas fa-chair"></i> Acomodo por Mesa</h2>
-            <p style="color:#888;font-size:.88rem;margin-bottom:1rem;">
-                Para acomodar el salón y para la lista del día del evento. El ✓ marca quién ya llegó.
-            </p>
+            <h2><i class="fas fa-chair"></i> Plano del Salón</h2>
+            <div class="plano-barra">
+                <label>
+                    Lugares por mesa
+                    <input type="number" id="capMesa" min="2" max="20" value="10"
+                           onchange="RSVP_ADMIN.cambiarCapacidad(this.value)">
+                </label>
+                <button class="btn-plano" onclick="RSVP_ADMIN.imprimirPlano()">
+                    <i class="fas fa-print"></i> Imprimir plano
+                </button>
+                <div class="plano-leyenda">
+                    <span><i class="pt ocupada"></i> ocupado</span>
+                    <span><i class="pt llego"></i> ya llegó</span>
+                    <span><i class="pt"></i> libre</span>
+                </div>
+            </div>
+            <p class="plano-resumen" id="mesasResumen"></p>
             <div class="mesas-grid" id="mesasGrid"></div>
         </section>
 
@@ -243,7 +263,7 @@
     };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/rsvp-admin-2.js"></script>
+    <script src="js/rsvp-admin-3.js"></script>
 <script src="js/foro7-footer.js?v=1"></script>
 <script>
 /* ── Notificaciones de datos pendientes ── */

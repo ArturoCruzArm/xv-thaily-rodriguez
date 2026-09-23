@@ -203,42 +203,147 @@
         set('personasLlegaron', personas + (personas === 1 ? ' persona' : ' personas'));
     }
 
-    /* ── Distribución por mesa ────────────────────────────────────────────────
-       Sirve para acomodar el salón y para imprimir la lista por mesa. */
-    function renderMesas() {
-        const cont = document.getElementById('mesasGrid');
-        if (!cont) return;
-        const porMesa = {};
+    /* ── Plano del salón ──────────────────────────────────────────────────────
+       Dibuja las mesas como se ven en el salón: un plato redondo con sus
+       sillas alrededor. Las sillas ocupadas llevan el nombre de quien se
+       sienta ahí, tomado del titular y de sus acompañantes registrados.
+
+       De dónde salen los nombres:
+         · Liga personalizada → el titular ya trae sus pases asignados y los
+           acompañantes que haya capturado al confirmar.
+         · Invitación genérica → quien se registra escribe su nombre y el de
+           sus acompañantes, y caen igual en la tabla `acompanantes`.
+       Cuando hay más pases que nombres, las sillas restantes quedan como
+       "sin nombre": son lugares apartados que todavía nadie identificó. */
+
+    const CAP_KEY = 'foro7_cap_mesa_' + (EVENTO_SLUG || 'x');
+
+    function capacidadMesa() {
+        const n = parseInt(localStorage.getItem(CAP_KEY), 10);
+        return (!isNaN(n) && n >= 2 && n <= 20) ? n : 10;
+    }
+
+    /* Personas y nombres de un invitado, en el orden en que se sientan. */
+    function ocupantes(g) {
+        const total = g.pases_confirmados || g.pases_asignados || 1;
+        const nombres = [g.nombre];
+        (g._acomps || []).forEach(a => { if (a.nombre) nombres.push(a.nombre); });
+        // Pases apartados que todavía no tienen nombre
+        while (nombres.length < total) nombres.push(null);
+        return nombres.slice(0, Math.max(total, nombres.length));
+    }
+
+    function agruparPorMesa() {
+        const mapa = {};
         guests.forEach(g => {
+            if (g.asiste === false || g.status === 'declinada') return;   // no ocupa lugar
             const m = (g.mesa_asignada || '').trim() || '__sin__';
-            (porMesa[m] = porMesa[m] || []).push(g);
+            (mapa[m] = mapa[m] || []).push(g);
         });
-        const claves = Object.keys(porMesa).sort((a, b) => {
+        return mapa;
+    }
+
+    function ordenMesas(claves) {
+        return claves.sort((a, b) => {
             if (a === '__sin__') return 1;
             if (b === '__sin__') return -1;
             const na = parseInt(a, 10), nb = parseInt(b, 10);
             if (!isNaN(na) && !isNaN(nb)) return na - nb;
             return a.localeCompare(b, 'es');
         });
-        if (!claves.length) { cont.innerHTML = '<p style="color:#999">Todavía no hay invitados.</p>'; return; }
+    }
+
+    function renderMesas() {
+        const cont = document.getElementById('mesasGrid');
+        if (!cont) return;
+
+        const cap   = capacidadMesa();
+        const capIn = document.getElementById('capMesa');
+        if (capIn && capIn.value !== String(cap)) capIn.value = cap;
+
+        const mapa   = agruparPorMesa();
+        const claves = ordenMesas(Object.keys(mapa));
+
+        if (!claves.length) {
+            cont.innerHTML = '<p style="color:#999">Todavía no hay invitados que acomodar.</p>';
+            const r = document.getElementById('mesasResumen');
+            if (r) r.textContent = '';
+            return;
+        }
+
+        let totalPersonas = 0, mesasLlenas = 0, sobrecupo = 0;
 
         cont.innerHTML = claves.map(m => {
-            const lista = porMesa[m];
-            const personas = lista.reduce((n, g) => n + (g.pases_confirmados || g.pases_asignados || 0), 0);
-            const llegaron = lista.filter(g => g.checkin_at).length;
-            const titulo = m === '__sin__' ? 'Sin mesa asignada' : 'Mesa ' + m;
-            return `<div class="mesa-card${m === '__sin__' ? ' mesa-sin' : ''}">
-                <div class="mesa-head">
-                    <strong>${titulo}</strong>
-                    <span>${personas} ${personas === 1 ? 'lugar' : 'lugares'}</span>
+            const lista = mapa[m];
+            let gente = [];
+            lista.forEach(g => {
+                ocupantes(g).forEach(n => gente.push({ nombre: n, llego: !!g.checkin_at, titular: g.nombre }));
+            });
+            const ocupadas = gente.length;
+            totalPersonas += ocupadas;
+
+            const esSin = (m === '__sin__');
+            const libres = Math.max(0, cap - ocupadas);
+            if (!esSin && libres === 0 && ocupadas === cap) mesasLlenas++;
+            if (!esSin && ocupadas > cap) sobrecupo++;
+
+            // Sillas: se dibujan tantas como capacidad, o más si hay sobrecupo
+            const sillas = Math.max(cap, ocupadas);
+            let aros = '';
+            for (let k = 0; k < sillas; k++) {
+                const ang = (360 / sillas) * k - 90;
+                const p = gente[k];
+                const cls = p ? (p.llego ? 'silla ocupada llego' : 'silla ocupada')
+                              : 'silla';
+                const tip = p ? (p.nombre || 'Lugar apartado (sin nombre)') : 'Lugar libre';
+                aros += `<span class="${cls}" style="transform:rotate(${ang}deg) translate(66px) rotate(${-ang}deg)" title="${tip}"></span>`;
+            }
+
+            const estado = esSin ? 'sin' : (ocupadas > cap ? 'excedida' : (ocupadas === 0 ? 'vacia' : (libres === 0 ? 'llena' : '')));
+            const titulo = esSin ? 'Sin mesa' : m;
+
+            const nombres = gente.map(p => `<li class="${p.llego ? 'llego' : ''}${p.nombre ? '' : ' anon'}">${p.nombre || '<em>sin nombre</em>'}</li>`).join('');
+
+            return `<div class="plano-mesa ${estado}" data-mesa="${m}">
+                <div class="plano-figura">
+                    <div class="plato">
+                        <span class="plato-num">${titulo}</span>
+                        <span class="plato-gente">${ocupadas}${esSin ? '' : '/' + cap}</span>
+                    </div>
+                    ${aros}
                 </div>
-                <ul class="mesa-lista">
-                    ${lista.map(g => `<li${g.checkin_at ? ' class="llego"' : ''}>${g.checkin_at ? '✓' : '·'} ${g.nombre}
-                        <small>${g.pases_confirmados || g.pases_asignados || 1}</small></li>`).join('')}
-                </ul>
-                <div class="mesa-pie">${llegaron} de ${lista.length} ya llegaron</div>
+                <div class="plano-pie">
+                    ${esSin ? '<strong>Falta asignarles mesa</strong>'
+                            : (ocupadas > cap ? `<strong class="alerta">${ocupadas - cap} de más</strong>`
+                                              : `${libres} ${libres === 1 ? 'lugar libre' : 'lugares libres'}`)}
+                </div>
+                <ul class="plano-lista">${nombres || '<li class="anon"><em>vacía</em></li>'}</ul>
             </div>`;
         }).join('');
+
+        const resumen = document.getElementById('mesasResumen');
+        if (resumen) {
+            const nMesas = claves.filter(c => c !== '__sin__').length;
+            const sinMesa = (mapa.__sin__ || []).length;
+            resumen.innerHTML = `<strong>${nMesas}</strong> ${nMesas === 1 ? 'mesa' : 'mesas'} · ` +
+                `<strong>${totalPersonas}</strong> personas acomodadas` +
+                (mesasLlenas ? ` · ${mesasLlenas} llena${mesasLlenas === 1 ? '' : 's'}` : '') +
+                (sobrecupo ? ` · <span class="alerta">${sobrecupo} con sobrecupo</span>` : '') +
+                (sinMesa ? ` · <span class="alerta">${sinMesa} sin mesa</span>` : '');
+        }
+    }
+
+    function cambiarCapacidad(v) {
+        const n = parseInt(v, 10);
+        if (isNaN(n) || n < 2 || n > 20) return;
+        localStorage.setItem(CAP_KEY, n);
+        renderMesas();
+    }
+
+    function imprimirPlano() {
+        document.body.classList.add('solo-plano');
+        window.print();
+        setTimeout(() => document.body.classList.remove('solo-plano'), 500);
     }
 
     /* ── Código QR del invitado ───────────────────────────────────────────────
@@ -477,5 +582,5 @@
         window.closeGuestModal = closeGuestModal;
     });
 
-    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR };
+    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR, cambiarCapacidad, imprimirPlano };
 })();
