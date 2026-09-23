@@ -1,0 +1,212 @@
+/* ============================================================
+   SELECTOR — XV Años Thaily Rodríguez
+   Depende de css/base.css
+   ============================================================ */
+
+/* ── Panel de control ─────────────────────────────────────── */
+.control-panel {
+    background: #fff;
+    padding: 18px 0 16px;
+    box-shadow: var(--sombra);
+    position: sticky; top: 0; z-index: 200;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.stat-card {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--vino-nube);
+    border: 2px solid transparent;
+    border-radius: var(--radio);
+    padding: 10px 12px;
+    transition: border-color .15s, background .15s;
+}
+.stat-card[data-cat="impresion"]  { border-left: 4px solid var(--c-impresion); }
+.stat-card[data-cat="album"]      { border-left: 4px solid var(--c-album); }
+.stat-card[data-cat="ampliacion"] { border-left: 4px solid var(--c-ampliacion); }
+.stat-card[data-cat="descartada"] { border-left: 4px solid var(--c-descartada); }
+.stat-card[data-cat="sin"]        { border-left: 4px solid var(--c-sin); }
+.stat-card.completo { border-color: #7FB185; background: #F0F7F1; }
+.stat-card.excedido { border-color: #E9A23B; background: #FFF6EA; }
+.stat-icon  { font-size: 1.45rem; }
+.stat-info h3 { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--texto-suave); }
+.stat-count { font-size: 1.2rem; font-weight: 700; font-family: 'Montserrat', sans-serif; }
+
+.action-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.action-buttons.secondary { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--linea); }
+
+.nota-filtro {
+    text-align: center; font-size: .82rem; color: var(--texto-suave);
+    margin-top: 10px; min-height: 1.2em;
+}
+
+/* ── Galería ──────────────────────────────────────────────── */
+.gallery-section { padding: 24px 0 60px; }
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+}
+
+.photo-card {
+    position: relative;
+    background: #fff;
+    border-radius: var(--radio);
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: var(--sombra);
+    border: 3px solid transparent;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.photo-card:hover { transform: translateY(-3px); box-shadow: var(--sombra-alta); }
+.photo-card.hidden { display: none; }
+
+.photo-card.has-impresion  { border-color: var(--c-impresion); }
+.photo-card.has-album      { border-color: var(--c-album); }
+.photo-card.has-ampliacion { border-color: var(--c-ampliacion); }
+.photo-card.has-descartada { border-color: var(--c-descartada); opacity: .55; }
+.photo-card.has-multiple   { border-color: var(--dorado); }
+
+.photo-image-container { aspect-ratio: 3 / 2; background: var(--vino-nube); overflow: hidden; }
+.photo-image-container img { width: 100%; height: 100%; object-fit: cover; }
+
+.photo-number {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(74,58,56,.72); color: #fff;
+    font-size: .7rem; padding: 3px 9px; border-radius: 999px;
+}
+.photo-badges {
+    position: absolute; bottom: 8px; left: 8px; right: 8px;
+    display: flex; gap: 4px; flex-wrap: wrap;
+}
+
+.no-photos {
+    grid-column: 1 / -1;
+    text-align: center; padding: 70px 20px;
+    color: var(--texto-suave);
+    background: #fff; border-radius: var(--radio);
+    border: 2px dashed var(--linea);
+}
+
+/* ── Modal de foto ────────────────────────────────────────── */
+.modal {
+    position: fixed; inset: 0; z-index: 9000;
+    background: rgba(45,34,33,.9);
+    display: none; align-items: center; justify-content: center;
+    padding: 14px;
+}
+.modal.active { display: flex; }
+
+.modal-content {
+    background: var(--crema);
+    border-radius: 18px;
+    width: 100%; max-width: 1080px; max-height: 92vh;
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+}
+.modal-close {
+    position: absolute; top: 8px; right: 10px; z-index: 3;
+    background: rgba(255,255,255,.9); border: none;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--texto);
+}
+.modal-body { display: flex; flex: 1; min-height: 0; }
+
+.modal-image-container {
+    flex: 1 1 62%; background: #241B1A;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; min-height: 0;
+}
+.modal-image-container img { max-width: 100%; max-height: 82vh; object-fit: contain; }
+.modal-photo-number {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.55); color: #fff;
+    font-size: .78rem; padding: 4px 12px; border-radius: 999px;
+}
+
+.modal-options {
+    flex: 0 0 300px;
+    padding: 20px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+    overflow-y: auto;
+}
+.modal-options h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.28rem; }
+.modal-subtitle { font-size: .8rem; color: var(--texto-suave); margin-bottom: 4px; }
+
+.option-buttons { display: flex; flex-direction: column; gap: 8px; }
+.option-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 2px solid var(--linea);
+    border-radius: 12px; padding: 11px 13px;
+    cursor: pointer; font-family: inherit; font-size: .9rem;
+    color: var(--texto); text-align: left;
+    transition: border-color .12s, background .12s;
+}
+.option-btn .option-icon { font-size: 1.15rem; }
+.option-btn .option-text { flex: 1; }
+.option-btn .option-check { opacity: 0; font-weight: 700; }
+.option-btn.selected .option-check { opacity: 1; }
+.option-btn.impresion.selected  { border-color: var(--c-impresion);  background: #EAF3FA; }
+.option-btn.album.selected      { border-color: var(--c-album);      background: #F3EFF7; }
+.option-btn.ampliacion.selected { border-color: var(--c-ampliacion); background: #FAF3E2; }
+.option-btn.descartada.selected { border-color: var(--c-descartada); background: #FAECEB; }
+
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 12px; }
+.modal-actions .btn { flex: 1 1 auto; font-size: .82rem; padding: 9px 12px; }
+.btn-descarga { background: var(--vino-nube); border-color: var(--linea); }
+.btn-guardar  { background: linear-gradient(135deg, var(--granate), var(--dorado)); color: #fff; }
+
+.modal-nav-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,.85); border: none;
+    width: 42px; height: 42px; border-radius: 50%;
+    font-size: 1.35rem; cursor: pointer; z-index: 9100; color: var(--texto);
+}
+.modal-prev { left: 14px; }
+.modal-next { right: 14px; }
+
+.modal-tip {
+    font-size: .74rem; color: var(--texto-suave);
+    text-align: center; border-top: 1px dashed var(--linea); padding-top: 10px;
+}
+
+/* ── Modal compartir álbum ────────────────────────────────── */
+#compartirModal .modal-content { max-width: 480px; }
+.compartir-cuerpo { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.compartir-cuerpo h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.4rem; }
+.compartir-cuerpo p  { font-size: .86rem; color: var(--texto-suave); }
+#compartirOpciones { display: flex; flex-direction: column; gap: 6px; }
+.compartir-op {
+    display: flex; align-items: center; gap: 9px;
+    background: #fff; border: 2px solid var(--linea); border-radius: 10px;
+    padding: 9px 12px; cursor: pointer; font-size: .9rem;
+}
+.compartir-op:has(input:checked) { border-color: var(--granate); background: var(--vino-nube); }
+#compartirUrl {
+    width: 100%; font-family: monospace; font-size: .78rem;
+    padding: 10px 12px; border: 1.5px solid var(--linea); border-radius: 10px;
+    background: var(--vino-nube); color: var(--texto);
+}
+.compartir-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.compartir-acciones .btn { flex: 1 1 120px; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .modal-body { flex-direction: column; }
+    .modal-options { flex: 0 0 auto; }
+    .modal-image-container img { max-height: 46vh; }
+}
+@media (max-width: 560px) {
+    .photos-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .stats-row   { grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 7px; }
+    .stat-card   { padding: 8px 9px; gap: 7px; }
+    .stat-icon   { font-size: 1.15rem; }
+    .stat-count  { font-size: 1rem; }
+    .btn         { font-size: .8rem; padding: 8px 13px; }
+    .control-panel { padding: 12px 0; }
+}

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato - XV Años | Foro 7</title>
+    <meta name="description" content="Contrato de servicios fotográficos y videográficos - XV Años 31 de Octubre 2026">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .print-header {
+            background-color: #1f2937;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .print-button {
+            background-color: #9c3049;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .print-button:hover {
+            background-color: #c2185b;
+        }
+
+        .print-info {
+            color: white;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .contract-container {
+            max-width: 1024px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+        }
+
+        .contract-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .contract-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .contract-subtitle {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+        }
+
+        .section-content {
+            margin-left: 1.5rem;
+        }
+
+        .section-content p {
+            margin-bottom: 0.5rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.25rem;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .pending {
+            color: #dc2626;
+            font-style: italic;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #d1d5db;
+            margin: 1.5rem 0;
+        }
+
+        .signatures {
+            margin-top: 4rem;
+        }
+
+        .signature-section {
+            margin-bottom: 3rem;
+        }
+
+        .signature-title {
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+
+        .package-details {
+            background-color: #f9eff0;
+            padding: 1rem;
+            border-left: 4px solid #9c3049;
+            margin: 1rem 0;
+        }
+
+        .price-breakdown {
+            background-color: #fef3c7;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin: 1rem 0;
+        }
+
+        .special-note {
+            background-color: #e8f5e9;
+            padding: 1rem;
+            border-left: 4px solid #4caf50;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+        }
+
+        .dron-included {
+            background-color: #e3f2fd;
+            padding: 1rem;
+            border-left: 4px solid #2196f3;
+            margin: 1rem 0;
+            border-radius: 0.375rem;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            background: #9c3049;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            background: #c2185b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(156, 48, 73, 0.3);
+        }
+
+        @media print {
+            .print-header {
+                display: none !important;
+            }
+
+            .nav-links {
+                display: none !important;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+
+            .contract-container {
+                padding: 2rem;
+                box-shadow: none;
+            }
+
+            @page {
+                margin: 2cm;
+            }
+
+            .section {
+                break-inside: avoid;
+            }
+
+            .signatures {
+                page-break-before: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .contract-container {
+                padding: 1.5rem;
+            }
+
+            .contract-title {
+                font-size: 2rem;
+            }
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #9c3049 0%, #6d1f33 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-size: 1.1rem;
+        }
+
+        .footer .company-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="print-header">
+        <div class="nav-links">
+            <a href="index.html">Invitación</a>
+            <a href="selector.html">Selector</a>
+            <a href="album.html">Álbum</a>
+            <a href="contrato.html">Contrato</a>
+            <a href="logistica.html">Logística</a>
+            <a href="preparativos.html">Preparativos</a>
+            <a href="datos.html">Datos</a>
+            <a href="datos-edicion.html">Datos Video</a>
+            <a href="invitados.html">Invitados</a>
+        </div>
+        <button class="print-button" onclick="window.print()">
+            Descargar como PDF
+        </button>
+        <p class="print-info">
+            Haz clic y selecciona Guardar como PDF
+        </p>
+    </div>
+
+    <div class="contract-container">
+        <div class="contract-header">
+            <h1 class="contract-title">FORO 7</h1>
+            <h2 class="contract-subtitle">CONTRATO DE SERVICIOS FOTOGRÁFICOS Y VIDEOGRÁFICOS</h2>
+        </div>
+
+        <div class="section">
+            <h3 class="section-title">DATOS DE LAS PARTES</h3>
+            <div class="section-content">
+                <p><span class="highlight">PRESTADOR DE SERVICIOS:</span></p>
+                <p style="margin-left: 1.5rem; margin-bottom: 0.75rem;">Foro 7 - Juan Arturo Cruz Armenta</p>
+                <p><span class="highlight">CONTRATANTE:</span></p>
+                <p style="margin-left: 1.5rem;"><strong><span class="pending">[NOMBRE POR CONFIRMAR]</span></strong></p>
+                <p style="margin-left: 1.5rem;">León, Gto.</p>
+                <p style="margin-left: 1.5rem;"><strong>Tel:</strong> <span class="pending">[POR CONFIRMAR]</span></p>
+                <p style="margin-left: 1.5rem; font-size: 0.9em; color: #666;">El trato se ha llevado por WhatsApp con Óptica BZ.</p>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">I. OBJETO DEL CONTRATO</h3>
+            <div class="section-content">
+                <p class="text-justify">
+                    El PRESTADOR se compromete a proporcionar los servicios de fotografía y videografía profesionales para los XV Años de <strong>THAILY RODRÍGUEZ</strong>, conforme al siguiente detalle:
+                </p>
+
+                <div class="package-details">
+                    <p class="highlight">PAQUETE CONTRATADO: PAQUETE 1 MODIFICADO</p>
+                </div>
+
+                <p class="highlight" style="margin-top: 1rem; margin-bottom: 0.5rem;">El paquete incluye:</p>
+                <ul>
+                    <li><strong>50 fotos del evento impresas</strong> en tamaño <strong>5x7 pulgadas</strong></li>
+                    <li><strong>1 Película USB en 4K</strong> de 2:00 hrs, original y copia</li>
+                    <li><strong>1 Caja impresa</strong> para la USB</li>
+                    <li><strong>1 Caja impresa</strong> para las fotografías</li>
+                    <li><strong>1 Fotografía ampliada a 20x24 pulgadas</strong></li>
+                    <li><strong>1 Sesión fotográfica</strong> antes del evento o el día del evento</li>
+                    <li>Cubre <strong>4 horas de recepción</strong></li>
+                    <li><strong>Invitación web</strong> (incluida sin costo)</li>
+                </ul>
+
+                <div class="special-note">
+                    <p class="highlight">MODIFICACIÓN ACORDADA: SIN COBERTURA DE MISA</p>
+                    <p style="font-size: 0.95em; margin-top: 0.5rem;">A petición de la contratante se <strong>retiró la hora de cobertura de la ceremonia religiosa</strong> y a cambio la fotografía ampliada sube de tamaño a <strong>20x24 pulgadas</strong>. Además se incluye la <strong>invitación web sin costo</strong>. La cobertura queda en <strong>4 horas de recepción</strong> más la sesión fotográfica.</p>
+                </div>
+
+                <div class="dron-included" title="Servicio incluido sin costo">
+                    <p class="highlight">INVITACIÓN WEB INCLUIDA</p>
+                    <p style="font-size: 0.95em; margin-top: 0.5rem;">Invitación digital personalizada con cuenta regresiva, mapa, confirmación de asistencia en línea y galería de la sesión, para compartir por WhatsApp. Se entrega <strong>sin costo adicional</strong>.</p>
+                </div>
+
+                <div class="special-note">
+                    <p class="highlight">MESA RESERVADA PARA PERSONAL</p>
+                    <p style="font-size: 0.95em; margin-top: 0.5rem;">Se reservarán <strong>2 lugares en mesa</strong> para el personal de fotografía y video durante el evento.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">II. DATOS DEL EVENTO</h3>
+            <div class="section-content">
+                <p><span class="highlight">Tipo de evento:</span> XV Años</p>
+                <p><span class="highlight">Quinceañera:</span> <strong>THAILY RODRÍGUEZ</strong> <span class="pending">[apellido materno por confirmar]</span></p>
+                <p><span class="highlight">Mamá:</span> Elizabeth Rodríguez</p>
+                <p><span class="highlight">Papá:</span> <span class="pending">[POR CONFIRMAR]</span></p>
+                <p><span class="highlight">Hermano:</span> Didier Rodríguez</p>
+                <p><span class="highlight">Madrina Principal:</span> <span class="pending">[POR CONFIRMAR]</span></p>
+                <p><span class="highlight">Fecha del evento:</span> Sábado 31 de Octubre de 2026 <span style="font-size:0.9em;color:#666;">(confirmada por la contratante el 22/09/2026; antes se había hablado del 24)</span></p>
+                <p><span class="highlight">Invitados estimados:</span> 100 personas</p>
+                <p><span class="highlight">Sesión fotográfica previa:</span> <span class="pending">[POR AGENDAR]</span> &mdash; Templo Expiatorio, León, Gto. Entre semana o domingo, 3:00 PM</p>
+                <p><span class="highlight">Ceremonia religiosa:</span> <span class="pending">[POR CONFIRMAR]</span> &mdash; <strong>sin cobertura fotográfica</strong>, según la modificación acordada</p>
+                <p><span class="highlight">Hora de la Recepción:</span> <span class="pending">[POR CONFIRMAR]</span></p>
+                <p><span class="highlight">Lugar de la Recepción (Fiesta):</span> <span class="pending">[POR CONFIRMAR]</span></p>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">III. CONDICIONES ECONÓMICAS</h3>
+            <div class="section-content">
+                <p class="highlight" style="margin-bottom: 0.5rem;">Desglose del servicio:</p>
+                <div class="price-breakdown">
+                    <p>Paquete 1 modificado (sin cobertura de misa, ampliación 20x24"): $5,000.00 MXN</p>
+                    <p>Invitación web: incluida sin costo</p>
+                    <p style="font-weight:600; margin-top:6px;">Costo total: $5,000.00 MXN</p>
+                </div>
+
+                <p><span class="highlight">Monto total del servicio:</span> $5,000.00 MXN (Cinco mil pesos 00/100 M.N.)</p>
+                <p><span class="highlight">Apartado:</span> <span class="pending">[PENDIENTE]</span> — monto a elección de la contratante, aún no recibido</p>
+                <p><span class="highlight">Forma de pago del apartado:</span> Transferencia bancaria BBVA</p>
+                <p style="margin-left: 1.5rem; font-size: 0.9em; color: #666;">Cuenta: 4152 3145 9966 8897</p>
+                <p style="margin-left: 1.5rem; font-size: 0.9em; color: #666;">Titular: Juan Arturo Cruz Armenta</p>
+                <p><span class="highlight">Saldo pendiente:</span> $5,000.00 MXN menos el apartado que se entregue</p>
+                <p style="margin-top: 0.5rem;"><span class="highlight">Fecha límite de liquidación:</span> 23 de Octubre de 2026</p>
+                <p style="font-style: italic; font-size: 0.875rem;">(8 días antes del evento)</p>
+                <div class="special-note" style="margin-top:1rem;">
+                    <p class="highlight">FECHA APARTADA SIN ANTICIPO</p>
+                    <p style="font-size: 0.95em; margin-top: 0.5rem;">La fecha del 31 de octubre de 2026 quedó apartada a petición de la contratante el 22 de septiembre de 2026. El apartado queda pendiente de definir y recibir; mientras no se reciba, la fecha no está asegurada frente a otras solicitudes.</p>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">IV. FORMA DE ENTREGA</h3>
+            <div class="section-content">
+                <p class="highlight" style="margin-bottom: 0.5rem;">Entrega Digital:</p>
+                <ul style="margin-bottom: 0.75rem;">
+                    <li>Todo el material fotográfico y videográfico en formato digital será entregado posterior al evento</li>
+                    <li>Todas las fotos editadas en alta resolución</li>
+                    <li>Película en 4K de 2:00 hrs, editada, musicalizada y titulada</li>
+                    <li>Galería en línea para elegir las fotos a imprimir</li>
+                </ul>
+
+                <p class="highlight" style="margin-bottom: 0.5rem;">Entrega Física:</p>
+                <ul>
+                    <li>Una vez concluido el evento, se seleccionarán las 50 fotografías para impresión desde el selector en línea</li>
+                    <li>Selección de la fotografía que se amplía a 20x24 pulgadas</li>
+                    <li>Confirmación de conformidad del video editado</li>
+                    <li>El material físico (fotos impresas con su caja, USB original y copia con su caja, y la ampliación) será entregado una vez completada la selección y aprobación</li>
+                    <li>Plazo de entrega: no mayor a <strong>60 días hábiles</strong> posteriores al evento</li>
+                    <li>El material digital se resguarda <strong>6 meses</strong> a partir de la fecha de entrega</li>
+                    <li>El material entregable debe recogerse dentro de los <strong>30 días</strong> siguientes al aviso de disponibilidad</li>
+                </ul>
+
+                <p class="highlight" style="margin-top: 1rem; margin-bottom: 0.5rem;">Invitación Web:</p>
+                <ul>
+                    <li>Se creará una invitación web digital personalizada</li>
+                    <li>La invitación incluirá fotos de la sesión previa (cuando esté disponible)</li>
+                    <li>Podrá compartirse por WhatsApp, redes sociales y otros medios digitales</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">V. OBLIGACIONES DEL PRESTADOR</h3>
+            <div class="section-content">
+                <ol>
+                    <li>Realizar la sesión fotográfica previa en la fecha acordada</li>
+                    <li>Realizar la cobertura fotográfica y videográfica profesional de la recepción (4 horas)</li>
+                    <li>Entregar la fotografía ampliada a 20x24 pulgadas que elija la contratante</li>
+                    <li>Realizar edición profesional del material fotográfico y videográfico</li>
+                    <li>Entregar todos los productos físicos especificados en el paquete</li>
+                    <li>Entregar el material digital completo</li>
+                    <li>Crear y entregar la invitación web digital personalizada</li>
+                    <li>Cumplir con todos los entregables detallados en el contrato</li>
+                </ol>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">VI. OBLIGACIONES DEL CONTRATANTE</h3>
+            <div class="section-content">
+                <ol>
+                    <li>Liquidar el saldo pendiente a más tardar el 23 de Octubre de 2026 (8 días antes del evento)</li>
+                    <li>Facilitar el acceso a las locaciones del evento (sesión y salón)</li>
+                    <li>Informar con al menos 15 días de anticipación cualquier cambio de fecha, hora o lugar del evento</li>
+                    <li>Seleccionar las 50 fotografías para impresión física y la fotografía de la ampliación</li>
+                    <li>Confirmar la aprobación del video editado</li>
+                    <li>Proporcionar información necesaria para la invitación web</li>
+                    <li><strong>Reservar 2 lugares en mesa para el personal de foto y video</strong></li>
+                    <li>Proporcionar cualquier información adicional necesaria para el servicio</li>
+                </ol>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">VII. CLÁUSULAS ADICIONALES</h3>
+            <div class="section-content">
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">1. MODIFICACIONES:</span> Cualquier modificación al presente contrato deberá ser acordada por ambas partes por escrito.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">2. CANCELACIÓN:</span> En caso de cancelación por parte del CONTRATANTE, el apartado entregado no será reembolsable. Si la cancelación se realiza con menos de 7 días de anticipación, se cobrará el 50% del costo total.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">3. DERECHOS DE AUTOR:</span> El PRESTADOR conserva los derechos de autor del material creado, pero otorga al CONTRATANTE licencia de uso personal del mismo.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">4. CONTINGENCIAS:</span> En caso de enfermedad o emergencia del PRESTADOR, este se compromete a proporcionar un fotógrafo/videógrafo de reemplazo con capacidades similares.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">5. CONDICIONES CLIMÁTICAS:</span> En caso de condiciones climáticas adversas que impidan la realización de la sesión fotográfica en el Templo Expiatorio, se reprogramará en una fecha mutuamente conveniente.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">6. PERMISOS:</span> El CONTRATANTE se compromete a obtener los permisos necesarios de las locaciones para la realización de fotografía y video, incluida la sesión en el Templo Expiatorio.
+                </p>
+
+                <p class="text-justify" style="margin-bottom: 0.5rem;">
+                    <span class="highlight">7. HORA EXTRA:</span> En caso de requerir cobertura adicional más allá de las 4 horas de recepción incluidas, se cobrará $500 MXN por cada hora extra. La ceremonia religiosa no está incluida en la cobertura.
+                </p>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section">
+            <h3 class="section-title">VIII. ACEPTACIÓN</h3>
+            <div class="section-content">
+                <p class="text-justify">
+                    Ambas partes manifiestan su conformidad con los términos establecidos en el presente contrato y lo firman en León, Guanajuato, a los <span class="pending">[DÍA]</span> días del mes de <span class="pending">[MES]</span> de 2026.
+                </p>
+            </div>
+        </div>
+
+        <div class="signatures">
+            <div class="signature-section">
+                <p class="signature-title">PRESTADOR DE SERVICIOS</p>
+                <div style="margin-top: 3rem; border-top: 2px solid #000; padding-top: 0.5rem; max-width: 300px;">
+                    <p style="font-weight: 600;">Juan Arturo Cruz Armenta</p>
+                    <p>Foro 7</p>
+                </div>
+            </div>
+
+            <div class="signature-section">
+                <p class="signature-title">CONTRATANTE</p>
+                <div style="margin-top: 3rem; border-top: 2px solid #000; padding-top: 0.5rem; max-width: 300px;">
+                    <p style="font-weight: 600;"><span class="pending">[NOMBRE POR CONFIRMAR]</span></p>
+                    <p>Tel: <span class="pending">[POR CONFIRMAR]</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p class="company-name">Producciones Foro 7</p>
+        <p>Fotografía, Video e Invitaciones Web</p>
+        <p>📱 WhatsApp: 477-920-3776</p>
+        <p>📧 Email: foro7producciones@gmail.com</p>
+        <p>📍 Padilla 112, Cumbres de Arbide, León, Gto.</p>
+    </div>
+    <script src="visitas.js?v=1"></script>
+
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>

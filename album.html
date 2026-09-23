@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6d1f33">
+<title>Álbum · XV Años Thaily Rodríguez</title>
+<meta property="og:title" content="XV Años de Thaily Rodríguez">
+<meta property="og:description" content="Álbum de fotos · 31 de octubre de 2026 · FORO 7">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=1">
+<link rel="stylesheet" href="css/album.css?v=1">
+<script>
+    /* Con ?filtro=… la página es SOLO álbum: sin herramientas ni ayuda.
+       Sin ?filtro se muestran las herramientas y los filtros normales. */
+    (function () {
+        var p = new URLSearchParams(location.search);
+        var f = (p.get('filtro') || p.get('f') || '').trim();
+        window.MOSTRAR_AYUDA = !f;
+    })();
+</script>
+</head>
+<body>
+
+<header class="album-hero">
+    <p class="album-tipo"   id="albumTipo">XV Años</p>
+    <h1 class="album-nombre" id="albumNombre">Thaily Rodríguez</h1>
+    <p class="album-titulo" id="albumTitulo">Álbum de fotos</p>
+    <p class="album-sub"    id="albumSub"></p>
+    <p class="album-conteo" id="albumConteo"></p>
+</header>
+
+<!-- Herramientas: solo visibles cuando NO hay ?filtro -->
+<section class="album-herramientas" id="albumHerramientas" hidden>
+    <div class="container">
+        <div class="album-stats"   id="albumStats"></div>
+        <div class="album-filtros" id="albumFiltros"></div>
+        <div class="action-buttons secondary">
+            <a class="btn btn-primario" href="selector.html">✨ Abrir mi selector de fotos</a>
+            <button class="btn btn-suave" data-abrir-ayuda>❔ ¿Qué hace cada herramienta?</button>
+            <a class="btn btn-suave" href="index.html">🏠 Inicio</a>
+        </div>
+    </div>
+</section>
+
+<div class="album-acciones">
+    <button class="btn btn-primario" id="btnCompartirAlbum">🔗 Compartir este álbum</button>
+</div>
+
+<main>
+    <div class="container">
+        <div class="album-grid" id="albumGrid"></div>
+    </div>
+</main>
+
+<nav class="album-otros" id="albumOtros"></nav>
+
+<!-- ─────────── Lightbox ─────────── -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Foto a pantalla completa">
+    <span class="lb-contador" id="lbContador"></span>
+    <button class="lb-btn" id="lbCerrar" aria-label="Cerrar">&times;</button>
+    <button class="lb-btn" id="lbPrev"   aria-label="Anterior">&#10094;</button>
+    <button class="lb-btn" id="lbNext"   aria-label="Siguiente">&#10095;</button>
+    <img id="lbImagen" src="" alt="">
+    <button class="lb-btn" id="lbDescargar">⬇ Descargar</button>
+</div>
+
+<footer class="footer">
+    <p>FORO 7 · Fotografía y Video · León, Gto.</p>
+    <p><a href="https://wa.me/524779203776" target="_blank" rel="noopener">WhatsApp 477 920 3776</a></p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/supabase-api.js?v=1"></script>
+<script src="js/album.js?v=1"></script>
+<script src="js/ayuda.js?v=1"></script>
+<script src="visitas.js?v=1"></script>
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>

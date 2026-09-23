@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6d1f33">
+<meta name="robots" content="noindex, nofollow">
+<title>Selector de Fotos · XV Años Thaily Rodríguez</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css?v=1">
+<link rel="stylesheet" href="css/selector.css?v=1">
+</head>
+<body>
+
+<header class="header">
+    <p class="script">Selector de Fotos</p>
+    <h1 class="main-title" id="tituloEvento">Thaily Rodríguez</h1>
+    <p class="subtitle" id="subtituloEvento">XV Años</p>
+    <p class="instructions" id="instrucciones"></p>
+</header>
+
+<section class="control-panel">
+    <div class="container">
+        <div class="stats-row" id="statsRow"></div>
+        <div class="action-buttons" id="filterRow"></div>
+        <p class="nota-filtro" id="notaFiltro"></p>
+
+        <div class="aviso aviso-naranja" id="avisoExtra"></div>
+        <div class="aviso aviso-dorado"  id="avisoAmpliacion"></div>
+        <div class="aviso aviso-gris"    id="avisoOffline">
+            📴 Sin conexión con la nube. Tus marcas se guardan en este dispositivo y se sincronizan al reconectar.
+        </div>
+
+        <div class="action-buttons secondary">
+            <button class="btn btn-suave"    id="btnExport">📥 Descargar Reporte</button>
+            <button class="btn btn-suave"    id="btnCopy">📤 Copiar Resumen</button>
+            <button class="btn btn-primario" id="btnShareAlbum">🔗 Compartir Álbum</button>
+            <a class="btn btn-suave" href="album.html">📖 Ver álbum digital</a>
+            <button class="btn btn-suave" data-abrir-ayuda>❔ Ayuda</button>
+            <button class="btn btn-suave"    id="btnClear">🗑️ Limpiar Todo</button>
+        </div>
+    </div>
+</section>
+
+<main class="gallery-section">
+    <div class="container">
+        <div class="photos-grid" id="photosGrid"></div>
+    </div>
+</main>
+
+<!-- ─────────── Modal de foto ─────────── -->
+<div class="modal" id="photoModal" role="dialog" aria-modal="true" aria-label="Clasificar foto">
+    <button class="modal-nav-btn modal-prev" id="btnPrev" aria-label="Foto anterior">&#10094;</button>
+    <button class="modal-nav-btn modal-next" id="btnNext" aria-label="Foto siguiente">&#10095;</button>
+    <div class="modal-content">
+        <button class="modal-close" aria-label="Cerrar">&times;</button>
+        <div class="modal-body">
+            <div class="modal-image-container">
+                <img id="modalImage" src="" alt="">
+                <div class="modal-photo-number" id="modalPhotoNumber" aria-live="polite"></div>
+            </div>
+            <div class="modal-options">
+                <h3>¿Qué quieres con esta foto?</h3>
+                <p class="modal-subtitle">Puedes marcar varias opciones a la vez.</p>
+                <div class="option-buttons" id="optionButtons"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-descarga" id="btnDownload">⬇ JPG</button>
+                    <button class="btn btn-descarga" id="btnDownloadClose">⬇ Descargar y Cerrar</button>
+                    <button class="btn btn-suave"    id="btnCancel">Cancelar</button>
+                    <button class="btn btn-guardar"  id="btnSave">Guardar</button>
+                </div>
+                <p class="modal-tip">
+                    Desliza → guarda y pasa a la siguiente · Desliza ← quita las marcas ·
+                    Teclas 1-4 marcan categoría · Enter guarda · Esc cierra
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─────────── Modal compartir álbum ─────────── -->
+<div class="modal" id="compartirModal" role="dialog" aria-modal="true" aria-label="Compartir álbum">
+    <div class="modal-content">
+        <button class="modal-close" id="compartirCerrar" aria-label="Cerrar">&times;</button>
+        <div class="compartir-cuerpo">
+            <h3>🔗 Compartir álbum</h3>
+            <p>
+                Genera un enlace de <strong>solo lectura</strong>. Quien lo abra verá únicamente
+                las fotos de esa categoría, en pantalla completa y <strong>sin las herramientas
+                del selector</strong>: no puede cambiar tu selección.
+            </p>
+            <div id="compartirOpciones"></div>
+            <input type="text" id="compartirUrl" readonly onclick="this.select()">
+            <div class="compartir-acciones">
+                <button class="btn btn-suave"    id="compartirCopiar">📋 Copiar</button>
+                <button class="btn btn-suave"    id="compartirAbrir">👁 Ver</button>
+                <button class="btn btn-primario" id="compartirWhatsapp">💬 WhatsApp</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+    <p>FORO 7 · Fotografía y Video · León, Gto.</p>
+    <p><a href="https://wa.me/524779203776" target="_blank" rel="noopener">WhatsApp 477 920 3776</a></p>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/photos.js"></script>
+<script src="js/supabase-api.js?v=1"></script>
+<script src="js/selector.js?v=1"></script>
+<script src="js/ayuda.js?v=1"></script>
+<script src="visitas.js?v=1"></script>
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>

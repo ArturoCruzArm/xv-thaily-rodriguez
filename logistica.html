@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logística - XV Años Thaily</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f9eff0 0%, #f0dee2 100%);
+            color: #333;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #9c3049 0%, #6d1f33 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 2.5rem 2rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #9c3049;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #9c3049;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f9eff0 0%, #f0dee2 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h3 {
+            color: #6d1f33;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .info-card p {
+            margin-bottom: 0.4rem;
+            line-height: 1.5;
+        }
+
+        .info-card a {
+            color: #9c3049;
+            font-weight: 600;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #9c3049 0%, #6d1f33 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            left: -2.5rem;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #9c3049;
+        }
+
+        .timeline-item.done:before {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .status-done {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background: #f9eff0;
+            border-left: 4px solid #9c3049;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .checklist li .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .checklist li .text strong {
+            color: #6d1f33;
+        }
+
+        .price-box {
+            background: linear-gradient(135deg, #9c3049 0%, #6d1f33 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .price-box .total {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .price-box .detail {
+            margin-top: 1rem;
+            opacity: 0.9;
+        }
+
+        .contact-box {
+            background: linear-gradient(135deg, #9c3049 0%, #6d1f33 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .contact-box a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .note-box {
+            background: #fff3cd;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .note-box strong {
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .content {
+                padding: 1.5rem;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media print {
+            .nav-links {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Logística del Evento</h1>
+            <p>XV Años Thaily Rodríguez · Sábado 31 de Octubre, 2026</p>
+
+            <div class="nav-links">
+                <a href="index.html">Invitación</a>
+                <a href="selector.html">Selector</a>
+                <a href="album.html">Álbum</a>
+                <a href="contrato.html">Contrato</a>
+                <a href="logistica.html">Logística</a>
+                <a href="preparativos.html">Preparativos</a>
+                <a href="datos.html">Datos</a>
+                <a href="datos-edicion.html">Datos Video</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Aviso de datos pendientes -->
+            <section class="section">
+                <div class="note-box">
+                    <strong>Esta página se irá llenando.</strong> Por ahora solo está confirmada la fecha
+                    (sábado 31 de octubre de 2026) y el paquete. Falta el lugar y la hora de la recepción,
+                    los nombres completos y agendar la sesión del Expiatorio.
+                </div>
+            </section>
+
+            <!-- Información del Evento -->
+            <section class="section">
+                <h2 class="section-title">📅 Información del Evento</h2>
+                <div class="grid-2">
+                    <div class="info-card">
+                        <h3>📸 Sesión fotográfica previa</h3>
+                        <p><strong>Lugar:</strong> Templo Expiatorio, León, Gto.</p>
+                        <p><strong>Hora acordada:</strong> 3:00 PM</p>
+                        <p><strong>Día:</strong> entre semana o domingo</p>
+                        <p style="color:#c0392b;"><strong>Fecha: por agendar</strong></p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>🎉 Recepción</h3>
+                        <p><strong>Fecha:</strong> Sábado 31 de octubre de 2026</p>
+                        <p><strong>Hora:</strong> <span style="color:#c0392b;">pendiente</span></p>
+                        <p><strong>Lugar:</strong> <span style="color:#c0392b;">pendiente</span></p>
+                        <p><strong>Invitados estimados:</strong> 100</p>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>Nota sobre la misa:</strong> en el paquete acordado se cambió la hora de cobertura
+                    de la ceremonia religiosa por la ampliación más grande (20x24"), así que
+                    <strong>la misa no lleva fotógrafo</strong>. Si la familia quiere cobertura de misa,
+                    se cotiza aparte.
+                </div>
+            </section>
+
+            <!-- Pagos -->
+            <section class="section">
+                <h2 class="section-title">💰 Resumen de Pagos</h2>
+                <div class="grid-2">
+                    <div class="price-box">
+                        <div class="total">$5,000 MXN</div>
+                        <div class="detail">Paquete 1 modificado · invitación web incluida</div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Estado de Pagos</h3>
+                        <p><span class="status-pending">⏳ Apartado:</span> pendiente de definir y recibir</p>
+                        <p><span class="status-pending">⏳ Saldo:</span> $5,000 menos lo que se entregue de apartado</p>
+                        <p><strong>Fecha límite:</strong> 23 de octubre 2026</p>
+                        <p style="font-size: 0.9em; color: #666;">(8 días antes del evento)</p>
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>Datos para transferencia:</strong> BBVA · 4152 3145 9966 8897 ·
+                    Juan Arturo Cruz Armenta. El monto del apartado queda a elección de la contratante.
+                </div>
+            </section>
+
+            <!-- Cronología -->
+            <section class="section">
+                <h2 class="section-title">🗓️ Fechas Importantes</h2>
+                <div class="timeline">
+                    <div class="timeline-item done">
+                        <strong>21 de Septiembre 2026</strong> <span class="status-done">✓ Completado</span>
+                        <p>Se acordó el paquete: sin cobertura de misa, ampliación 20x24" e invitación web incluida</p>
+                    </div>
+                    <div class="timeline-item done">
+                        <strong>22 de Septiembre 2026</strong> <span class="status-done">✓ Completado</span>
+                        <p>Fecha confirmada: sábado 31 de octubre (antes se había hablado del 24)</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>Por definir</strong> <span class="status-pending">⏳ Pendiente</span>
+                        <p>Apartado para asegurar la fecha</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>Por agendar</strong> <span class="status-pending">⏳ Pendiente</span>
+                        <p>Sesión fotográfica en el Templo Expiatorio (3:00 PM)</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>23 de Octubre 2026</strong>
+                        <p>Fecha límite para liquidar el saldo</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>31 de Octubre 2026</strong>
+                        <p><strong>DÍA DEL EVENTO</strong> — 4 horas de recepción</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>Hasta 60 días hábiles después</strong>
+                        <p>Entrega del material (fotos impresas, USB y ampliación)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lo que necesitamos de ti -->
+            <section class="section">
+                <h2 class="section-title">✅ Lo que necesitamos de ti</h2>
+                <ul class="checklist">
+                    <li>
+                        <span class="icon">📝</span>
+                        <div class="text">
+                            <strong>Nombre completo de quien contrata y su teléfono</strong><br>
+                            Para poner el contrato a nombre de la persona correcta
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">👧</span>
+                        <div class="text">
+                            <strong>Nombre completo de Thaily</strong><br>
+                            Con los dos apellidos, para el contrato y los créditos del video
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">👨‍👩‍👧</span>
+                        <div class="text">
+                            <strong>Papá, padrinos y madrinas</strong><br>
+                            Ya tenemos a la mamá (Elizabeth) y al hermanito (Didier). Faltan los demás,
+                            y los nombres reales de los abuelitos para los créditos
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📍</span>
+                        <div class="text">
+                            <strong>Lugar y hora de la recepción</strong><br>
+                            Es lo que falta para poder mandar la invitación a los 100 invitados
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📸</span>
+                        <div class="text">
+                            <strong>Agendar la sesión en el Expiatorio</strong><br>
+                            A las 3:00 PM, entre semana o domingo. Cuando ya tenga vestido, ramo y uñas
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">💳</span>
+                        <div class="text">
+                            <strong>Apartado</strong><br>
+                            El monto que guste, para asegurar la fecha
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">🎵</span>
+                        <div class="text">
+                            <strong>Canciones</strong><br>
+                            La del vals y la que quieras de fondo en la invitación web
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">🍽️</span>
+                        <div class="text">
+                            <strong>Reservar mesa para el personal</strong><br>
+                            2 lugares para el equipo de foto y video durante la recepción
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="note-box">
+                    Los datos se capturan en <a href="datos.html">datos.html</a> y la invitación
+                    <strong>se actualiza sola</strong>: en cuanto se guarde el lugar y la hora,
+                    aparecen en <a href="index.html">la invitación</a> sin tener que rehacerla.
+                </div>
+            </section>
+
+            <!-- Paquete Incluido -->
+            <section class="section">
+                <h2 class="section-title">📦 Tu Paquete Incluye</h2>
+                <div class="grid-2">
+                    <div class="info-card">
+                        <h3>🎬 Cobertura</h3>
+                        <p>✓ Sesión fotográfica previa</p>
+                        <p>✓ 4 horas de recepción</p>
+                        <p style="color:#999;">✗ Ceremonia religiosa (se cambió por la ampliación grande)</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>📷 Entregables</h3>
+                        <p>✓ 50 fotos impresas 5x7" con su caja</p>
+                        <p>✓ Película USB 4K de 2:00 hrs, original y copia, con su caja</p>
+                        <p>✓ Ampliación 20x24 pulgadas</p>
+                        <p>✓ Invitación web (cortesía)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contacto -->
+            <section class="section">
+                <div class="contact-box">
+                    <h3 style="margin-bottom: 1rem;">📞 Contacto Foro 7</h3>
+                    <p><strong>WhatsApp:</strong> <a href="https://wa.me/5214779203776">477-920-3776</a></p>
+                    <p><strong>Email:</strong> <a href="mailto:foro7producciones@gmail.com">foro7producciones@gmail.com</a></p>
+                    <p style="margin-top: 1rem;"><strong>Local:</strong> Padilla 112, Cumbres de Arbide, León, Gto.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+    <script src="visitas.js?v=1"></script>
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producción Foro 7 - XV Años 31 Octubre 2026</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #1f2937;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 3px solid #9b6fc9;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.8;
+        }
+
+        .badge-internal {
+            display: inline-block;
+            background: #9b6fc9;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #9b6fc9;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #9b6fc9;
+        }
+
+        .info-box {
+            background: #374151;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .info-box h3 {
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-box p {
+            margin-bottom: 0.3rem;
+        }
+
+        .info-box a {
+            color: #34d399;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: #374151;
+            border-left: 4px solid #9b6fc9;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checklist li:hover {
+            background: #4b5563;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            font-size: 1.3rem;
+            color: #9b6fc9;
+        }
+
+        .checklist li.done {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .checklist li.done:before {
+            content: "✓";
+            color: #34d399;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #9b6fc9;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            left: -2.4rem;
+            top: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #1f2937;
+            border: 3px solid #9b6fc9;
+        }
+
+        .timeline-item.done:before {
+            background: #34d399;
+            border-color: #34d399;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .status-done {
+            background: #065f46;
+            color: #34d399;
+        }
+
+        .status-pending {
+            background: #78350f;
+            color: #fbbf24;
+        }
+
+        .price-box {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .price-box .total {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .price-box .detail {
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .equipment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .equipment-item {
+            background: #374151;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .equipment-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Producción Foro 7</h1>
+            <p>XV Años - Sábado 31 de Octubre, 2026</p>
+            <span class="badge-internal">USO INTERNO</span>
+        </div>
+
+        <div class="content">
+            <!-- Alerta de agenda -->
+            <section class="section">
+                <div class="info-box" style="border-left:4px solid #fbbf24;">
+                    <h3 style="color:#fbbf24;">⚠ Revisar agenda del 31 de octubre</h3>
+                    <p>Ese mismo día está <strong>xv-luz-estefania</strong>: misa 2:00 PM y recepción
+                    3:30 a 5:30 PM en casa de la familia Alcaraz Esparza (Los Tepetates).</p>
+                    <p style="margin-top:.5rem;">Thaily son 4 horas de recepción sin misa. Si su fiesta
+                    empieza de 7:00 PM en adelante, los dos eventos caben en el día. <strong>Confirmar la
+                    hora de Thaily antes de cerrar el apartado.</strong></p>
+                </div>
+            </section>
+
+            <!-- Resumen del Evento -->
+            <section class="section">
+                <h2 class="section-title">📋 Resumen del Evento</h2>
+                <div class="grid-2">
+                    <div class="info-box">
+                        <h3>📸 Sesión previa</h3>
+                        <p><strong>Templo Expiatorio</strong>, León</p>
+                        <p>3:00 PM, entre semana o domingo</p>
+                        <p style="color:#fbbf24;">⚠ Fecha por agendar</p>
+                        <p style="margin-top:.5rem;">Ojo: el Expiatorio pide permiso para sesiones.</p>
+                    </div>
+                    <div class="info-box">
+                        <h3>🎉 Recepción - 4 hrs</h3>
+                        <p><strong>Sábado 31 de octubre de 2026</strong></p>
+                        <p style="color:#fbbf24;">⚠ Hora por confirmar</p>
+                        <p style="color:#fbbf24;">⚠ Lugar por confirmar</p>
+                        <p style="margin-top:.5rem;">~100 invitados</p>
+                    </div>
+                </div>
+                <div class="info-box" style="margin-top:1rem;">
+                    <p><strong>Sin cobertura de misa.</strong> Se cambió la hora de ceremonia por la
+                    ampliación de 20x24" y se regaló la invitación web. No mandar equipo al templo
+                    el día del evento.</p>
+                </div>
+            </section>
+
+            <!-- Datos del Cliente -->
+            <section class="section">
+                <h2 class="section-title">👤 Datos del Cliente</h2>
+                <div class="info-box">
+                    <p><strong>Quinceañera:</strong> THAILY RODRÍGUEZ <span style="color:#fbbf24;">(apellido materno pendiente)</span></p>
+                    <p><strong>Mamá:</strong> Elizabeth Rodríguez</p>
+                    <p><strong>Hermano:</strong> Didier Rodríguez</p>
+                    <p><strong>Abuelitos:</strong> "pachuy" y "ma kukis" <span style="color:#fbbf24;">(apodos; pedir nombres reales para créditos)</span></p>
+                    <p><strong>Papá:</strong> <span style="color:#fbbf24;">pendiente</span></p>
+                    <p><strong>Contratante:</strong> <span style="color:#fbbf24;">pendiente</span> — el trato va por WhatsApp con <strong>Óptica BZ</strong></p>
+                    <p><strong>Paquete:</strong> Paquete 1 modificado, sin misa, ampliación 20x24"</p>
+                    <p><strong>Cobertura:</strong> Sesión previa + 4 hrs de recepción</p>
+                    <p><strong>Mesa:</strong> 2 lugares reservados para personal</p>
+                    <p style="margin-top:.6rem;"><strong>Referencia:</strong> el papá del contacto ya había
+                    hecho evento con nosotros; este es más chico (~100 invitados).</p>
+                </div>
+            </section>
+
+            <!-- Finanzas -->
+            <section class="section">
+                <h2 class="section-title">💰 Finanzas</h2>
+                <div class="grid-2">
+                    <div class="price-box">
+                        <div class="total">$5,000 MXN</div>
+                        <div class="detail">Total del paquete</div>
+                    </div>
+                    <div class="info-box">
+                        <p style="color:#fbbf24;">⏳ <strong>Apartado:</strong> sin definir, sin recibir</p>
+                        <p>⏳ <strong>Saldo:</strong> $5,000</p>
+                        <p>📅 <strong>Límite pago:</strong> 23 octubre 2026</p>
+                        <p style="color:#fbbf24;margin-top:.5rem;">⚠ Fecha apartada sin anticipo: insistir
+                        con el apartado antes de rechazar otras solicitudes para el 31.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline -->
+            <section class="section">
+                <h2 class="section-title">🕐 Timeline del Proyecto</h2>
+                <div class="timeline">
+                    <div class="timeline-item done">
+                        <strong>21 Sep 2026</strong> <span class="status-badge status-done">✓</span>
+                        <p>Se cierra el paquete: sin misa, ampliación 20x24", invitación web de cortesía</p>
+                    </div>
+                    <div class="timeline-item done">
+                        <strong>22 Sep 2026</strong> <span class="status-badge status-done">✓</span>
+                        <p>Fecha confirmada: 31 de octubre. Llegan primeros nombres para el video</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>Por definir</strong> <span class="status-badge status-pending">⏳</span>
+                        <p>Apartado</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>Por agendar</strong> <span class="status-badge status-pending">⏳</span>
+                        <p>Sesión en el Expiatorio (permiso + hora)</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>23 Oct 2026</strong> <span class="status-badge status-pending">⏳</span>
+                        <p>Fecha límite saldo</p>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>31 Oct 2026</strong> <span class="status-badge status-pending">⏳</span>
+                        <p>DÍA DEL EVENTO</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Checklist Sesión -->
+            <section class="section">
+                <h2 class="section-title">📸 Checklist - Sesión en el Expiatorio</h2>
+                <ul class="checklist" id="checklist-sesion">
+                    <li onclick="this.classList.toggle('done')">Confirmar fecha y hora con la clienta</li>
+                    <li onclick="this.classList.toggle('done')">Tramitar permiso de sesión en el Expiatorio</li>
+                    <li onclick="this.classList.toggle('done')">Verificar que ya tenga vestido, ramo y uñas</li>
+                    <li onclick="this.classList.toggle('done')">Verificar equipo foto (cámaras, lentes)</li>
+                    <li onclick="this.classList.toggle('done')">Cargar baterías</li>
+                    <li onclick="this.classList.toggle('done')">Formatear tarjetas</li>
+                    <li onclick="this.classList.toggle('done')">Reflectores / iluminación</li>
+                    <li onclick="this.classList.toggle('done')">Convertir a WebP y publicar en img/ del repo</li>
+                </ul>
+            </section>
+
+            <!-- Checklist Día del Evento -->
+            <section class="section">
+                <h2 class="section-title">🎬 Checklist - Día del Evento</h2>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: #60a5fa; margin-bottom: 1rem;">Equipo Foto</h3>
+                        <ul class="checklist">
+                            <li onclick="this.classList.toggle('done')">Cámara principal</li>
+                            <li onclick="this.classList.toggle('done')">Cámara backup</li>
+                            <li onclick="this.classList.toggle('done')">Lentes (35mm, 50mm, 85mm)</li>
+                            <li onclick="this.classList.toggle('done')">3 Flashes</li>
+                            <li onclick="this.classList.toggle('done')">Baterías cargadas</li>
+                            <li onclick="this.classList.toggle('done')">Baterías repuesto</li>
+                            <li onclick="this.classList.toggle('done')">Tarjetas formateadas</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color: #60a5fa; margin-bottom: 1rem;">Equipo Video</h3>
+                        <ul class="checklist">
+                            <li onclick="this.classList.toggle('done')">Cámara video principal</li>
+                            <li onclick="this.classList.toggle('done')">Cámara video secundaria</li>
+                            <li onclick="this.classList.toggle('done')">2 Luces LED</li>
+                            <li onclick="this.classList.toggle('done')">Trípodes</li>
+                            <li onclick="this.classList.toggle('done')">Micrófono/audio</li>
+                            <li onclick="this.classList.toggle('done')">Baterías video</li>
+                            <li onclick="this.classList.toggle('done')">Tarjetas video</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="color: #60a5fa; margin-bottom: 1rem;">General</h3>
+                    <ul class="checklist">
+                        <li onclick="this.classList.toggle('done')">Confirmar saldo recibido ($5,000)</li>
+                        <li onclick="this.classList.toggle('done')">Confirmar dirección y hora del salón</li>
+                        <li onclick="this.classList.toggle('done')">Verificar que NO se cubre la misa</li>
+                        <li onclick="this.classList.toggle('done')">Cronometrar las 4 horas desde el inicio de la recepción</li>
+                        <li onclick="this.classList.toggle('done')">Ubicar mesa reservada para personal</li>
+                        <li onclick="this.classList.toggle('done')">Verificar enchufes para carga</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Checklist Post-Evento -->
+            <section class="section">
+                <h2 class="section-title">💻 Checklist - Post-Evento</h2>
+                <ul class="checklist">
+                    <li onclick="this.classList.toggle('done')">Respaldar fotos (2 discos)</li>
+                    <li onclick="this.classList.toggle('done')">Respaldar video (2 discos)</li>
+                    <li onclick="this.classList.toggle('done')">Editar fotografías</li>
+                    <li onclick="this.classList.toggle('done')">Editar película 4K de 2:00 hrs (musicalizar, titular)</li>
+                    <li onclick="this.classList.toggle('done')">Subir fotos del evento al selector</li>
+                    <li onclick="this.classList.toggle('done')">Cliente selecciona 50 fotos + 1 ampliación</li>
+                    <li onclick="this.classList.toggle('done')">Imprimir 50 fotos 5x7"</li>
+                    <li onclick="this.classList.toggle('done')">Imprimir ampliación 20x24"</li>
+                    <li onclick="this.classList.toggle('done')">Grabar USB original + copia</li>
+                    <li onclick="this.classList.toggle('done')">Preparar caja de USB y caja de fotos</li>
+                    <li onclick="this.classList.toggle('done')">Entregar material completo</li>
+                </ul>
+            </section>
+
+            <!-- Entregables -->
+            <section class="section">
+                <h2 class="section-title">📦 Entregables</h2>
+                <div class="equipment-grid">
+                    <div class="equipment-item">
+                        <div class="icon">📷</div>
+                        <p><strong>50 fotos</strong></p>
+                        <p>5x7 pulgadas</p>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="icon">💿</div>
+                        <p><strong>USB 4K</strong></p>
+                        <p>2 hrs, original + copia</p>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="icon">📦</div>
+                        <p><strong>Cajas</strong></p>
+                        <p>USB + Fotos</p>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="icon">🖼️</div>
+                        <p><strong>Ampliación</strong></p>
+                        <p>20x24 pulgadas</p>
+                    </div>
+                    <div class="equipment-item">
+                        <div class="icon">🌐</div>
+                        <p><strong>Invitación Web</strong></p>
+                        <p>Cortesía</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        // Guardar estado de checklist en localStorage
+        document.querySelectorAll('.checklist li').forEach((item, index) => {
+            const key = 'xv-oct31-thaily-check-' + index;
+            if (localStorage.getItem(key) === 'done') {
+                item.classList.add('done');
+            }
+            item.addEventListener('click', function() {
+                if (this.classList.contains('done')) {
+                    localStorage.setItem(key, 'done');
+                } else {
+                    localStorage.removeItem(key);
+                }
+            });
+        });
+    </script>
+    <script src="visitas.js?v=1"></script>
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>

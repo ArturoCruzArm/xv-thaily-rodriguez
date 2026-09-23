@@ -1,0 +1,29 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de backup
+*.backup
+*.bak
+*~
+
+# Carpetas de imágenes grandes (subir por separado)
+images/originals/
+images/raw/
+
+# Archivos temporales
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Node modules (si se usa)
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

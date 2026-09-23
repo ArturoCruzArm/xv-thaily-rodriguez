@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparativos - XV Años</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f9eff0 0%, #f0dee2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #9c3049 0%, #6d1f33 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .header h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .intro-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ffc107;
+        }
+
+        .intro-box h2 {
+            color: #f57f17;
+            margin-bottom: 0.5rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #9c3049;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #9c3049;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f9eff0;
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #9c3049;
+        }
+
+        .checklist li:hover {
+            background: #f8bbd9;
+        }
+
+        .checklist li.checked {
+            background: #c8e6c9;
+            border-left-color: #4caf50;
+            opacity: 0.8;
+        }
+
+        .checklist li.checked .checkbox {
+            background: #4caf50;
+            color: white;
+        }
+
+        .checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #9c3049;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            background: white;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-content strong {
+            color: #6d1f33;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .item-content small {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .tip-box {
+            background: #e3f2fd;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            border-left: 4px solid #2196f3;
+        }
+
+        .tip-box strong {
+            color: #1565c0;
+        }
+
+        .warning-box {
+            background: #ffebee;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid #f44336;
+        }
+
+        .warning-box strong {
+            color: #c62828;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .mini-card {
+            background: #f0dee2;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .mini-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mini-card strong {
+            color: #7b1fa2;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #9c3049 0%, #6d1f33 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Preparativos XV Años</h1>
+            <p>Thaily · Sábado 31 de octubre de 2026</p>
+            <div class="nav-links">
+                <a href="index.html">Invitación</a>
+                <a href="selector.html">Selector</a>
+                <a href="album.html">Álbum</a>
+                <a href="contrato.html">Contrato</a>
+                <a href="logistica.html">Logística</a>
+                <a href="preparativos.html">Preparativos</a>
+                <a href="datos.html">Datos</a>
+                <a href="datos-edicion.html">Datos Video</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="intro-box">
+                <h2>Tu progreso</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                </div>
+                <p id="progressText">Marca los elementos que ya tienes listos</p>
+            </div>
+
+            <!-- SESIÓN FOTOGRÁFICA -->
+            <section class="section">
+                <h2 class="section-title">📸 Para la Sesión Fotográfica</h2>
+
+                <div class="warning-box">
+                    <strong>Importante:</strong> tu sesión será en el <strong>Templo Expiatorio</strong> a las 3:00 PM,
+                    entre semana o domingo. Avísanos en cuanto tengas listo el vestido, el ramo y las uñas
+                    para agendar el día y tramitar el permiso del templo.
+                </div>
+
+                <ul class="checklist" id="checklist-sesion">
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👗 Vestido de XV años</strong>
+                            <small>Preferentemente que NO arrastre mucho para poder moverte con facilidad durante las poses. Si arrastra, ten cuidado al caminar.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👠 Zapatillas</strong>
+                            <small>Las que usarás el día del evento. Practica caminar con ellas para mantener buena postura.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💅 Uñas arregladas</strong>
+                            <small>Manicure completo. Las manos salen en muchas fotos (anillo, ramo, poses).</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💄 Maquillaje profesional</strong>
+                            <small>Maquillaje que dure y se vea bien en fotos. Evita brillos excesivos.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💇‍♀️ Peinado</strong>
+                            <small>El peinado que usarás el día del evento, ya terminado.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💐 Ramo de flores</strong>
+                            <small>Tu ramo de quinceañera para las fotos.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👑 Corona o tiara</strong>
+                            <small>La corona que usarás en tu ceremonia.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💍 Anillo de XV años</strong>
+                            <small>Si tendrás anillo, tenlo listo para las fotos de detalle.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💎 Accesorios (aretes, collar, pulsera)</strong>
+                            <small>Todos los accesorios que complementan tu look.</small>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="tip-box">
+                    <strong>💡 Tips para la sesión:</strong>
+                    <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                        <li>Mantén la espalda recta y los hombros hacia atrás</li>
+                        <li>Practica tu sonrisa natural frente al espejo</li>
+                        <li>Descansa bien la noche anterior</li>
+                        <li>Hidrata tu piel días antes</li>
+                        <li>Lleva agua y snacks ligeros</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- DÍA DEL EVENTO -->
+            <section class="section">
+                <h2 class="section-title">🎉 Para el Día del Evento</h2>
+
+                <ul class="checklist" id="checklist-evento">
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👗 Vestido de XV años</strong>
+                            <small>Tu vestido principal, planchado y listo.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👠 Zapatillas de ceremonia</strong>
+                            <small>Las zapatillas para la misa y entrada al salón.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👟 Zapatos de cambio (flats)</strong>
+                            <small>Zapatos cómodos para bailar después del vals.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👑 Corona/Tiara</strong>
+                            <small>Para la coronación durante la ceremonia.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💐 Ramo</strong>
+                            <small>El ramo de quinceañera.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🪆 Última muñeca</strong>
+                            <small>La muñeca que simboliza tu despedida de la niñez.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>📖 Biblia o Misal</strong>
+                            <small>Para la ceremonia religiosa.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>📿 Rosario</strong>
+                            <small>Para la bendición en la misa.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🛋️ Cojín de ceremonia</strong>
+                            <small>Para arrodillarte durante la misa.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💍 Anillo de XV años</strong>
+                            <small>El anillo que te entregarán.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💎 Juego de accesorios completo</strong>
+                            <small>Aretes, collar, pulsera, todo coordinado.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>📔 Álbum de firmas</strong>
+                            <small>Para que tus invitados dejen sus mensajes.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🎁 Recuerdos para invitados</strong>
+                            <small>Los souvenirs que entregarás.</small>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- CEREMONIA DEL EVENTO -->
+            <section class="section">
+                <h2 class="section-title">✨ Ceremonias Tradicionales</h2>
+                <p style="margin-bottom: 1rem; color: #666;">Marca las ceremonias que tendrás en tu evento:</p>
+
+                <ul class="checklist" id="checklist-ceremonias">
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👠 Cambio de zapatillas</strong>
+                            <small>Tu papá o padrino te cambia los zapatos de niña por zapatillas de mujer.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>👑 Coronación</strong>
+                            <small>Te colocan la corona/tiara simbolizando tu nuevo estatus.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💍 Entrega del anillo</strong>
+                            <small>Recepción del anillo de XV años.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🪆 Entrega de última muñeca</strong>
+                            <small>Despedida simbólica de la infancia.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💃 Vals con papá</strong>
+                            <small>El primer vals tradicional.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>💃 Vals con chambelanes</strong>
+                            <small>Baile coreografiado con chambelanes.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🥂 Brindis</strong>
+                            <small>Brindis especial de XV años.</small>
+                        </div>
+                    </li>
+                    <li onclick="toggleCheck(this)">
+                        <div class="checkbox"></div>
+                        <div class="item-content">
+                            <strong>🎂 Mordida de pastel</strong>
+                            <small>Partir y probar el pastel.</small>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- TIPS DE POSTURA -->
+            <section class="section">
+                <h2 class="section-title">🧘‍♀️ Tips de Postura para Fotos</h2>
+
+                <div class="grid-2">
+                    <div class="mini-card">
+                        <div class="icon">🧍‍♀️</div>
+                        <strong>Espalda recta</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Imagina un hilo que te jala desde la coronilla hacia arriba.</p>
+                    </div>
+                    <div class="mini-card">
+                        <div class="icon">👃</div>
+                        <strong>Mentón ligeramente arriba</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Evita la papada, mantén el mentón paralelo al piso.</p>
+                    </div>
+                    <div class="mini-card">
+                        <div class="icon">💪</div>
+                        <strong>Hombros hacia atrás</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Abre el pecho, relaja los hombros.</p>
+                    </div>
+                    <div class="mini-card">
+                        <div class="icon">🦵</div>
+                        <strong>Peso en una pierna</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Carga el peso en la pierna de atrás, relaja la de adelante.</p>
+                    </div>
+                    <div class="mini-card">
+                        <div class="icon">🤲</div>
+                        <strong>Manos suaves</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">No aprietes, mantén los dedos relajados y elegantes.</p>
+                    </div>
+                    <div class="mini-card">
+                        <div class="icon">😊</div>
+                        <strong>Sonrisa natural</strong>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Piensa en algo que te haga feliz, sonríe con los ojos.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="footer">
+            <p>Foro 7 Producciones | WhatsApp: 477-920-3776</p>
+        </div>
+    </div>
+
+    <script>
+        // Cargar estado guardado
+        document.addEventListener('DOMContentLoaded', function() {
+            const allItems = document.querySelectorAll('.checklist li');
+            allItems.forEach((item, index) => {
+                if (localStorage.getItem('prep-item-' + index) === 'checked') {
+                    item.classList.add('checked');
+                    item.querySelector('.checkbox').textContent = '✓';
+                }
+            });
+            updateProgress();
+        });
+
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            const checkbox = element.querySelector('.checkbox');
+            checkbox.textContent = element.classList.contains('checked') ? '✓' : '';
+
+            // Guardar estado
+            const allItems = document.querySelectorAll('.checklist li');
+            allItems.forEach((item, index) => {
+                if (item === element) {
+                    if (item.classList.contains('checked')) {
+                        localStorage.setItem('prep-item-' + index, 'checked');
+                    } else {
+                        localStorage.removeItem('prep-item-' + index);
+                    }
+                }
+            });
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = document.querySelectorAll('.checklist li').length;
+            const checked = document.querySelectorAll('.checklist li.checked').length;
+            const percent = Math.round((checked / total) * 100);
+
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').textContent = percent + '%';
+
+            if (percent === 100) {
+                document.getElementById('progressText').textContent = '¡Felicidades! Estás lista para tu sesión y evento 🎉';
+            } else if (percent >= 70) {
+                document.getElementById('progressText').textContent = '¡Vas muy bien! Ya casi tienes todo listo';
+            } else if (percent >= 30) {
+                document.getElementById('progressText').textContent = 'Sigue así, vas avanzando';
+            } else {
+                document.getElementById('progressText').textContent = 'Marca los elementos que ya tienes listos';
+            }
+        }
+    </script>
+    <script src="visitas.js?v=1"></script>
+<script src="js/foro7-footer.js?v=1"></script>
+</body>
+</html>
