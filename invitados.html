@@ -10,6 +10,51 @@
     <link rel="stylesheet" href="css/servicios.css?v=1">
     <link rel="stylesheet" href="css/invitados.css?v=1">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+    /* ── Acomodo por mesa ── */
+    .mesas-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px;
+    }
+    .mesa-card {
+        background: #fff; border: 1px solid #e6e6ee; border-top: 4px solid #6c5ce7;
+        border-radius: 10px; padding: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .mesa-card.mesa-sin { border-top-color: #fdcb6e; }
+    .mesa-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: .6rem; }
+    .mesa-head strong { font-size: 1rem; }
+    .mesa-head span { font-size: .78rem; color: #888; }
+    .mesa-lista { list-style: none; margin: 0; padding: 0; }
+    .mesa-lista li {
+        display: flex; justify-content: space-between; gap: 8px;
+        font-size: .86rem; padding: 3px 0; color: #444; border-bottom: 1px dashed #f0f0f5;
+    }
+    .mesa-lista li.llego { color: #2e9e5b; font-weight: 600; }
+    .mesa-lista li small { color: #999; }
+    .mesa-pie { margin-top: .6rem; font-size: .74rem; color: #888; }
+
+    /* ── Modal de código QR ── */
+    #qrModal {
+        display: none; position: fixed; inset: 0; z-index: 9500;
+        background: rgba(20,16,20,.7); align-items: center; justify-content: center; padding: 18px;
+    }
+    #qrModal.show { display: flex; }
+    .qr-caja {
+        background: #fff; border-radius: 14px; padding: 26px 22px;
+        text-align: center; max-width: 340px; width: 100%;
+    }
+    .qr-caja h3 { font-size: 1.15rem; margin-bottom: .2rem; color: #2d3436; }
+    .qr-caja .qr-sub { font-size: .84rem; color: #888; margin-bottom: 1rem; }
+    #qrCanvas { display: flex; justify-content: center; margin-bottom: 1rem; }
+    #qrCanvas img, #qrCanvas canvas { border-radius: 8px; }
+    .qr-acciones { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .qr-acciones button {
+        flex: 1 1 auto; padding: 11px 16px; border: none; border-radius: 8px;
+        font-family: inherit; font-size: .86rem; font-weight: 600; cursor: pointer;
+    }
+    .qr-descargar { background: #6c5ce7; color: #fff; }
+    .qr-cerrar { background: #eee; color: #444; }
+    .qr-nota { font-size: .76rem; color: #999; margin-top: .9rem; line-height: 1.5; }
+</style>
 </head>
 <body>
     <div class="admin-container">
@@ -39,6 +84,10 @@
                     <div class="stat-info"><h3>Sin Respuesta</h3><p class="stat-value" id="pendientes">0</p></div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon" style="background:#2e9e5b"><i class="fas fa-door-open"></i></div>
+                    <div class="stat-info"><h3>Ya llegaron</h3><p class="stat-value" id="yaLlegaron">0</p><small style="color:#999" id="personasLlegaron">0 personas</small></div>
+                </div>
+                <div class="stat-card">
                     <div class="stat-icon" style="background:#d63031"><i class="fas fa-times-circle"></i></div>
                     <div class="stat-info"><h3>Declinados</h3><p class="stat-value" id="noAsistiran">0</p></div>
                 </div>
@@ -56,6 +105,7 @@
                     <button class="filter-btn" data-filter="declinada">Declinada</button>
                 </div>
                 <button class="btn-add-guest" onclick="openAddGuestModal()"><i class="fas fa-plus"></i> Agregar Invitado</button>
+                <a class="btn-add-guest" href="acceso.html" style="background:#2e9e5b;text-decoration:none;display:inline-flex;align-items:center;gap:8px;"><i class="fas fa-qrcode"></i> Control de acceso</a>
             </div>
         </section>
         <section class="service-section">
@@ -73,6 +123,14 @@
             </div>
         </section>
         <section class="service-section">
+            <h2><i class="fas fa-chair"></i> Acomodo por Mesa</h2>
+            <p style="color:#888;font-size:.88rem;margin-bottom:1rem;">
+                Para acomodar el salón y para la lista del día del evento. El ✓ marca quién ya llegó.
+            </p>
+            <div class="mesas-grid" id="mesasGrid"></div>
+        </section>
+
+        <section class="section">
             <h2><i class="fas fa-chart-pie"></i> Distribucion por Categoria</h2>
             <div class="category-cards">
                 <div class="category-card"><div class="category-icon" style="background:#a97fd6"><i class="fas fa-home"></i></div><h4>Familia</h4><p class="category-count" id="catFamilia">0</p></div>
@@ -92,6 +150,23 @@
     </div>
 
     <!-- Modal Agregar/Editar Invitado -->
+    <!-- Código QR del invitado -->
+    <div id="qrModal" onclick="if(event.target===this)RSVP_ADMIN.cerrarQR()">
+        <div class="qr-caja">
+            <h3 id="qrNombre">Invitado</h3>
+            <p class="qr-sub"><span id="qrMesa"></span> · <span id="qrPases"></span></p>
+            <div id="qrCanvas"></div>
+            <div class="qr-acciones">
+                <button class="qr-descargar" onclick="RSVP_ADMIN.descargarQR()">Descargar PNG</button>
+                <button class="qr-cerrar" onclick="RSVP_ADMIN.cerrarQR()">Cerrar</button>
+            </div>
+            <p class="qr-nota">
+                El mismo código abre su invitación personalizada y sirve para registrar
+                su llegada en el <strong>control de acceso</strong>.
+            </p>
+        </div>
+    </div>
+
     <div id="guestModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -167,7 +242,8 @@
         eventDate: 'sábado 31 de octubre de 2026'
     };
     </script>
-    <script src="js/rsvp-admin.js?v=1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="js/rsvp-admin-2.js"></script>
 <script src="js/foro7-footer.js?v=1"></script>
 <script>
 /* ── Notificaciones de datos pendientes ── */

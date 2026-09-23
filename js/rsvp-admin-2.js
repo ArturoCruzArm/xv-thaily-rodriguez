@@ -188,13 +188,99 @@
         };
     }
 
-    function renderAll() { renderStats(); renderTable(); renderCategories(); }
+    function renderAll() { renderStats(); renderTable(); renderCategories(); renderMesas(); }
 
     function renderStats() {
         const s = calcStats(), set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
         set('totalInvitados', s.total); set('confirmados', s.confirmados);
         set('pendientes', s.pendientes); set('noAsistiran', s.declinados);
         set('totalAsistentes', s.totalAsisten); set('totalPases', s.totalPases + ' pases');
+
+        // Llegadas registradas en el acceso
+        const llegaron = guests.filter(g => g.checkin_at).length;
+        const personas = guests.reduce((n, g) => n + (g.checkin_at ? (g.pases_llegaron || 0) : 0), 0);
+        set('yaLlegaron', llegaron);
+        set('personasLlegaron', personas + (personas === 1 ? ' persona' : ' personas'));
+    }
+
+    /* ── Distribución por mesa ────────────────────────────────────────────────
+       Sirve para acomodar el salón y para imprimir la lista por mesa. */
+    function renderMesas() {
+        const cont = document.getElementById('mesasGrid');
+        if (!cont) return;
+        const porMesa = {};
+        guests.forEach(g => {
+            const m = (g.mesa_asignada || '').trim() || '__sin__';
+            (porMesa[m] = porMesa[m] || []).push(g);
+        });
+        const claves = Object.keys(porMesa).sort((a, b) => {
+            if (a === '__sin__') return 1;
+            if (b === '__sin__') return -1;
+            const na = parseInt(a, 10), nb = parseInt(b, 10);
+            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            return a.localeCompare(b, 'es');
+        });
+        if (!claves.length) { cont.innerHTML = '<p style="color:#999">Todavía no hay invitados.</p>'; return; }
+
+        cont.innerHTML = claves.map(m => {
+            const lista = porMesa[m];
+            const personas = lista.reduce((n, g) => n + (g.pases_confirmados || g.pases_asignados || 0), 0);
+            const llegaron = lista.filter(g => g.checkin_at).length;
+            const titulo = m === '__sin__' ? 'Sin mesa asignada' : 'Mesa ' + m;
+            return `<div class="mesa-card${m === '__sin__' ? ' mesa-sin' : ''}">
+                <div class="mesa-head">
+                    <strong>${titulo}</strong>
+                    <span>${personas} ${personas === 1 ? 'lugar' : 'lugares'}</span>
+                </div>
+                <ul class="mesa-lista">
+                    ${lista.map(g => `<li${g.checkin_at ? ' class="llego"' : ''}>${g.checkin_at ? '✓' : '·'} ${g.nombre}
+                        <small>${g.pases_confirmados || g.pases_asignados || 1}</small></li>`).join('')}
+                </ul>
+                <div class="mesa-pie">${llegaron} de ${lista.length} ya llegaron</div>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── Código QR del invitado ───────────────────────────────────────────────
+       Codifica su liga personal, así que el mismo código sirve para abrir la
+       invitación antes del evento y para registrar la llegada en la puerta. */
+    function mostrarQR(id) {
+        const g = guests.find(x => x.id === id);
+        if (!g) return;
+        const url = `${BASE_URL}?inv=${g.token}`;
+        const modal = document.getElementById('qrModal');
+        const caja  = document.getElementById('qrCanvas');
+        if (!modal || !caja) return;
+
+        document.getElementById('qrNombre').textContent = g.nombre;
+        document.getElementById('qrMesa').textContent = g.mesa_asignada ? ('Mesa ' + g.mesa_asignada) : 'Sin mesa asignada';
+        document.getElementById('qrPases').textContent =
+            (g.pases_asignados || 1) + ((g.pases_asignados || 1) === 1 ? ' pase' : ' pases');
+        caja.innerHTML = '';
+
+        if (typeof QRCode === 'undefined') {
+            caja.innerHTML = '<p style="color:#c0392b">No cargó el generador de códigos. Revisa tu conexión.</p>';
+        } else {
+            new QRCode(caja, { text: url, width: 260, height: 260, correctLevel: QRCode.CorrectLevel.M });
+        }
+        modal.dataset.nombre = g.nombre;
+        modal.classList.add('show');
+    }
+
+    function descargarQR() {
+        const modal = document.getElementById('qrModal');
+        const cv = document.querySelector('#qrCanvas canvas');
+        if (!cv) { showToast('El código aún no está listo'); return; }
+        const nombre = (modal.dataset.nombre || 'invitado').replace(/[^a-zA-Z0-9]+/g, '-');
+        const a = document.createElement('a');
+        a.href = cv.toDataURL('image/png');
+        a.download = 'QR-' + nombre + '.png';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+
+    function cerrarQR() {
+        const m = document.getElementById('qrModal');
+        if (m) m.classList.remove('show');
     }
 
     function renderCategories() {
@@ -249,11 +335,12 @@
                 <td style="text-align:center">${pConf}</td>
                 <td>${renderNombres(g)}</td>
                 <td>${g.mesa_asignada||'—'}</td>
-                <td><span class="status-badge ${s.c}">${s.i} ${s.t}</span></td>
+                <td><span class="status-badge ${s.c}">${s.i} ${s.t}</span>${g.checkin_at ? `<br><small style="color:#2e9e5b;font-weight:700">✓ Llegó ${new Date(g.checkin_at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})} (${g.pases_llegaron||0})</small>` : ''}</td>
                 <td style="font-size:.78rem">${fmtDate(g.fecha_envio)}<br>${fmtDate(g.fecha_confirmacion)}</td>
                 <td><div class="action-group">
                     ${g.telefono ? `<button class="btn-wa" onclick="RSVP_ADMIN.sendWhatsApp('${g.id}')"><i class="fab fa-whatsapp"></i></button>` : `<button class="btn-copy" onclick="RSVP_ADMIN.confirmManual('${g.id}')" style="background:#f39c12"><i class="fas fa-user-check"></i></button>`}
                     <button class="btn-copy" onclick="RSVP_ADMIN.copyLink('${g.id}')"><i class="fas fa-link"></i></button>
+                    <button class="btn-copy" onclick="RSVP_ADMIN.mostrarQR('${g.id}')" style="background:#2d3436" title="Código QR"><i class="fas fa-qrcode"></i></button>
                 </div></td>
                 <td><div class="action-group">
                     <button class="btn-edit" onclick="RSVP_ADMIN.openEdit('${g.id}')"><i class="fas fa-edit"></i></button>
@@ -390,5 +477,5 @@
         window.closeGuestModal = closeGuestModal;
     });
 
-    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual };
+    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR };
 })();

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0c0d">
+<title>Acceso · Control de llegadas</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+    /* ============================================================
+       CONTROL DE ACCESO — se usa en la puerta, con una mano y
+       con prisa. Todo grande, alto contraste, pocos pasos.
+       ============================================================ */
+    :root {
+        --fondo:    #0f0c0d;
+        --panel:    #1b1618;
+        --panel-2:  #251f21;
+        --linea:    #3a3134;
+        --texto:    #f6f2f3;
+        --suave:    #a9999d;
+        --ok:       #2e9e5b;
+        --aviso:    #d99427;
+        --error:    #c0392b;
+        --acento:   #9c3049;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+        font-family:'Montserrat',system-ui,sans-serif;
+        background:var(--fondo); color:var(--texto);
+        min-height:100svh; padding-bottom:2rem;
+        -webkit-font-smoothing:antialiased;
+    }
+    .wrap { max-width:560px; margin:0 auto; padding:0 14px; }
+
+    /* ── Barra superior con el marcador ── */
+    header {
+        position:sticky; top:0; z-index:50;
+        background:rgba(15,12,13,.97); backdrop-filter:blur(8px);
+        border-bottom:1px solid var(--linea); padding:12px 14px;
+    }
+    .marcador { display:flex; gap:8px; max-width:560px; margin:0 auto; }
+    .m-caja {
+        flex:1; background:var(--panel); border:1px solid var(--linea);
+        border-radius:10px; padding:8px 6px; text-align:center;
+    }
+    .m-num { display:block; font-size:1.6rem; font-weight:900; line-height:1.1; }
+    .m-lbl { font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--suave); }
+    .m-caja.llegaron .m-num { color:var(--ok); }
+    .m-caja.faltan   .m-num { color:var(--aviso); }
+
+    h1 { font-size:1.1rem; font-weight:900; text-align:center; margin:18px 0 4px; }
+    .sub { text-align:center; color:var(--suave); font-size:.78rem; margin-bottom:18px; }
+
+    /* ── Botones ── */
+    .btn {
+        display:flex; align-items:center; justify-content:center; gap:10px;
+        width:100%; padding:18px; border:none; border-radius:12px;
+        font-family:inherit; font-size:1rem; font-weight:900;
+        letter-spacing:.06em; text-transform:uppercase;
+        cursor:pointer; margin-bottom:10px;
+        background:var(--panel-2); color:var(--texto);
+        border:1px solid var(--linea);
+    }
+    .btn.principal { background:var(--acento); border-color:var(--acento); color:#fff; }
+    .btn.verde     { background:var(--ok);     border-color:var(--ok);     color:#fff; }
+    .btn:active { transform:scale(.985); }
+    .btn:disabled { opacity:.5; }
+    .btn.chico { padding:12px; font-size:.8rem; }
+
+    /* ── Escáner ── */
+    #lector { width:100%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:12px; }
+    #lector:empty { display:none; }
+
+    /* ── Búsqueda manual ── */
+    .buscador { position:relative; margin-bottom:12px; }
+    .buscador input {
+        width:100%; padding:16px 14px; font-size:1rem; font-family:inherit;
+        background:var(--panel); color:var(--texto);
+        border:1px solid var(--linea); border-radius:12px;
+    }
+    .buscador input:focus { outline:none; border-color:var(--acento); }
+    .resultados { margin-top:6px; }
+    .r-item {
+        display:flex; justify-content:space-between; align-items:center; gap:10px;
+        background:var(--panel); border:1px solid var(--linea);
+        border-radius:10px; padding:13px 14px; margin-bottom:6px; cursor:pointer;
+    }
+    .r-item:active { background:var(--panel-2); }
+    .r-nombre { font-weight:700; font-size:.95rem; }
+    .r-meta { font-size:.74rem; color:var(--suave); margin-top:2px; }
+    .r-mesa {
+        flex:0 0 auto; background:var(--panel-2); border:1px solid var(--linea);
+        border-radius:8px; padding:6px 10px; font-weight:900; font-size:.85rem;
+    }
+    .r-item.ya .r-mesa { background:rgba(46,158,91,.18); border-color:var(--ok); color:var(--ok); }
+
+    /* ── Ficha del invitado ── */
+    .ficha { display:none; }
+    .ficha.activa { display:block; }
+    .ficha-caja {
+        background:var(--panel); border:1px solid var(--linea);
+        border-top:5px solid var(--acento);
+        border-radius:14px; padding:22px 18px; text-align:center; margin-bottom:12px;
+    }
+    .ficha-caja.ya-llego { border-top-color:var(--ok); }
+    .ficha-nombre { font-size:1.5rem; font-weight:900; line-height:1.2; }
+    .ficha-estado { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--suave); margin-top:6px; }
+    .mesa-grande {
+        margin:18px auto 6px; padding:16px;
+        background:var(--panel-2); border:2px solid var(--acento);
+        border-radius:12px; max-width:260px;
+    }
+    .mesa-grande .et { font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:var(--suave); }
+    .mesa-grande .val { font-size:2.6rem; font-weight:900; line-height:1.1; }
+    .mesa-grande.sin { border-color:var(--aviso); }
+    .mesa-grande.sin .val { font-size:1.1rem; color:var(--aviso); }
+
+    .pases-fila { display:flex; align-items:center; justify-content:center; gap:14px; margin:16px 0 4px; }
+    .pases-fila button {
+        width:52px; height:52px; border-radius:50%; border:1px solid var(--linea);
+        background:var(--panel-2); color:var(--texto);
+        font-size:1.7rem; font-weight:700; cursor:pointer; line-height:1;
+    }
+    .pases-fila button:active { background:var(--acento); }
+    #pasesLlegaron { font-size:2.4rem; font-weight:900; min-width:60px; }
+    .pases-et { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--suave); }
+
+    .aviso-ya {
+        background:rgba(46,158,91,.14); border:1px solid var(--ok); color:#9fe0b8;
+        border-radius:10px; padding:12px; font-size:.85rem; margin-bottom:12px;
+    }
+    .aviso-declino {
+        background:rgba(192,57,43,.14); border:1px solid var(--error); color:#f0a79f;
+        border-radius:10px; padding:12px; font-size:.85rem; margin-bottom:12px;
+    }
+
+    .toast {
+        position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px);
+        background:var(--ok); color:#fff; padding:14px 22px; border-radius:999px;
+        font-weight:700; font-size:.9rem; opacity:0; pointer-events:none;
+        transition:opacity .2s, transform .2s; z-index:9000; max-width:90vw; text-align:center;
+    }
+    .toast.show { opacity:1; transform:translate(-50%,0); }
+    .toast.err { background:var(--error); }
+
+    .pie { text-align:center; color:var(--suave); font-size:.72rem; margin-top:24px; }
+    .pie a { color:var(--texto); }
+    .oculto { display:none !important; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="marcador">
+        <div class="m-caja llegaron"><span class="m-num" id="mLlegaron">0</span><span class="m-lbl">Llegaron</span></div>
+        <div class="m-caja faltan"><span class="m-num" id="mFaltan">0</span><span class="m-lbl">Faltan</span></div>
+        <div class="m-caja"><span class="m-num" id="mPersonas">0</span><span class="m-lbl">Personas</span></div>
+    </div>
+</header>
+
+<div class="wrap">
+    <h1 id="tituloEvento">Control de acceso</h1>
+    <p class="sub" id="subEvento">Cargando…</p>
+
+    <!-- ── Vista principal ── -->
+    <div id="vistaPrincipal">
+        <button class="btn principal" id="btnEscanear">📷 Escanear código</button>
+        <div id="lector"></div>
+        <button class="btn chico oculto" id="btnDetener">Detener cámara</button>
+
+        <div class="buscador">
+            <input type="search" id="buscar" placeholder="…o busca por nombre" autocomplete="off">
+        </div>
+        <div class="resultados" id="resultados"></div>
+    </div>
+
+    <!-- ── Ficha del invitado ── -->
+    <div class="ficha" id="ficha">
+        <div class="ficha-caja" id="fichaCaja">
+            <div class="ficha-nombre" id="fNombre">—</div>
+            <div class="ficha-estado" id="fEstado"></div>
+
+            <div class="mesa-grande" id="fMesaCaja">
+                <div class="et">Mesa</div>
+                <div class="val" id="fMesa">—</div>
+            </div>
+
+            <div class="pases-fila">
+                <button type="button" id="btnMenos" aria-label="Menos personas">−</button>
+                <span id="pasesLlegaron">1</span>
+                <button type="button" id="btnMas" aria-label="Más personas">+</button>
+            </div>
+            <div class="pases-et" id="pasesEtiqueta">personas llegando</div>
+        </div>
+
+        <div id="avisoYa" class="aviso-ya oculto"></div>
+        <div id="avisoDeclino" class="aviso-declino oculto"></div>
+
+        <button class="btn verde" id="btnRegistrar">✓ Registrar llegada</button>
+        <button class="btn chico" id="btnVolver">← Volver</button>
+    </div>
+
+    <p class="pie">
+        FORO 7 · <a href="invitados.html">Gestión de invitados</a>
+    </p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+const SLUG    = 'xv-thaily-rodriguez';
+const SB_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
+const SB_H    = { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON, 'Content-Type': 'application/json' };
+
+let eventoId = null;
+let invitados = [];
+let actual = null;
+let lector = null;
+let escaneando = false;
+
+const $ = function (id) { return document.getElementById(id); };
+
+function toast(msg, esError) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.toggle('err', !!esError);
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
+}
+
+function vibrar(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
+
+/* ── Carga ────────────────────────────────────────────────── */
+async function cargar() {
+    try {
+        const evR = await fetch(SB_URL + '/rest/v1/eventos?slug=eq.' + SLUG + '&select=id,nombre,fecha_evento&limit=1', { headers: SB_H });
+        const [ev] = await evR.json();
+        if (!ev) { $('subEvento').textContent = 'No se encontró el evento.'; return; }
+        eventoId = ev.id;
+        $('tituloEvento').textContent = ev.nombre;
+
+        const gR = await fetch(SB_URL + '/rest/v1/invitados?evento_id=eq.' + eventoId +
+                               '&select=id,nombre,telefono,pases_asignados,pases_confirmados,pases_llegaron,mesa_asignada,status,asiste,token,checkin_at&order=nombre.asc',
+                               { headers: SB_H });
+        invitados = await gR.json();
+        pintarMarcador();
+    } catch (e) {
+        $('subEvento').textContent = 'Sin conexión. Revisa la señal e intenta de nuevo.';
+    }
+}
+
+function pintarMarcador() {
+    let llegaron = 0, personas = 0, esperados = 0;
+    invitados.forEach(function (g) {
+        if (g.checkin_at) { llegaron++; personas += (g.pases_llegaron || 0); }
+        if (g.asiste === true || g.status === 'confirmada') esperados++;
+    });
+    $('mLlegaron').textContent = llegaron;
+    $('mFaltan').textContent   = Math.max(0, esperados - llegaron);
+    $('mPersonas').textContent = personas;
+    $('subEvento').textContent = invitados.length + ' invitados en la lista · ' + esperados + ' confirmados';
+}
+
+/* ── Búsqueda manual: en la puerta siempre hay quien no trae
+      el código, así que esto no es un extra, es lo normal. ── */
+function normalizar(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+$('buscar').addEventListener('input', function () {
+    const q = normalizar(this.value.trim());
+    const cont = $('resultados');
+    if (q.length < 2) { cont.innerHTML = ''; return; }
+    const hits = invitados.filter(function (g) {
+        return normalizar(g.nombre).indexOf(q) !== -1 || (g.telefono || '').indexOf(q) !== -1;
+    }).slice(0, 12);
+    if (!hits.length) { cont.innerHTML = '<div class="r-item"><div class="r-nombre">Sin resultados</div></div>'; return; }
+    cont.innerHTML = hits.map(function (g) {
+        const pases = g.pases_confirmados || g.pases_asignados || 1;
+        return '<div class="r-item' + (g.checkin_at ? ' ya' : '') + '" data-id="' + g.id + '">' +
+               '<div><div class="r-nombre">' + g.nombre + '</div>' +
+               '<div class="r-meta">' + pases + (pases === 1 ? ' persona' : ' personas') +
+               (g.checkin_at ? ' · ya llegó' : '') + '</div></div>' +
+               '<div class="r-mesa">' + (g.mesa_asignada || '—') + '</div></div>';
+    }).join('');
+    Array.prototype.forEach.call(cont.querySelectorAll('.r-item[data-id]'), function (el) {
+        el.addEventListener('click', function () { abrirFicha(el.dataset.id); });
+    });
+});
+
+/* ── Ficha ────────────────────────────────────────────────── */
+function abrirFicha(id) {
+    const g = invitados.filter(function (x) { return x.id === id; })[0];
+    if (!g) return;
+    actual = g;
+
+    $('fNombre').textContent = g.nombre;
+    const mesa = (g.mesa_asignada || '').trim();
+    $('fMesa').textContent = mesa || 'Sin asignar';
+    $('fMesaCaja').classList.toggle('sin', !mesa);
+    $('fichaCaja').classList.toggle('ya-llego', !!g.checkin_at);
+
+    const etiquetas = { confirmada: 'Confirmó asistencia', declinada: 'Dijo que no asistiría',
+                        vista: 'Vio la invitación', enviada: 'Invitación enviada', pendiente: 'Sin respuesta' };
+    $('fEstado').textContent = etiquetas[g.status] || '';
+
+    const sugeridos = g.pases_llegaron || g.pases_confirmados || g.pases_asignados || 1;
+    $('pasesLlegaron').textContent = sugeridos;
+
+    const ya = $('avisoYa');
+    if (g.checkin_at) {
+        ya.textContent = '✓ Ya se registró a las ' + new Date(g.checkin_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) +
+                         ' con ' + (g.pases_llegaron || 0) + '. Puedes corregir el número y volver a guardar.';
+        ya.classList.remove('oculto');
+        $('btnRegistrar').textContent = '✓ Actualizar llegada';
+    } else {
+        ya.classList.add('oculto');
+        $('btnRegistrar').textContent = '✓ Registrar llegada';
+    }
+
+    const dec = $('avisoDeclino');
+    if (g.status === 'declinada' || g.asiste === false) {
+        dec.textContent = '⚠ Este invitado había dicho que no asistiría. Puedes registrarlo de todos modos.';
+        dec.classList.remove('oculto');
+    } else {
+        dec.classList.add('oculto');
+    }
+
+    $('vistaPrincipal').classList.add('oculto');
+    $('ficha').classList.add('activa');
+    window.scrollTo({ top: 0 });
+}
+
+function cerrarFicha() {
+    actual = null;
+    $('ficha').classList.remove('activa');
+    $('vistaPrincipal').classList.remove('oculto');
+    $('buscar').value = '';
+    $('resultados').innerHTML = '';
+}
+
+$('btnVolver').addEventListener('click', cerrarFicha);
+
+$('btnMas').addEventListener('click', function () {
+    $('pasesLlegaron').textContent = Math.min(30, parseInt($('pasesLlegaron').textContent, 10) + 1);
+});
+$('btnMenos').addEventListener('click', function () {
+    $('pasesLlegaron').textContent = Math.max(0, parseInt($('pasesLlegaron').textContent, 10) - 1);
+});
+
+/* ── Registrar la llegada ─────────────────────────────────── */
+$('btnRegistrar').addEventListener('click', async function () {
+    if (!actual) return;
+    const btn = this;
+    const n = parseInt($('pasesLlegaron').textContent, 10) || 0;
+    btn.disabled = true;
+    btn.textContent = 'Guardando…';
+    try {
+        const r = await fetch(SB_URL + '/rest/v1/invitados?id=eq.' + actual.id, {
+            method: 'PATCH',
+            headers: Object.assign({}, SB_H, { Prefer: 'return=representation' }),
+            body: JSON.stringify({ checkin_at: new Date().toISOString(), pases_llegaron: n })
+        });
+        if (!r.ok) throw new Error('No se guardó');
+        const [act] = await r.json();
+        const i = invitados.findIndex(function (x) { return x.id === actual.id; });
+        if (i !== -1) invitados[i] = Object.assign(invitados[i], act);
+        pintarMarcador();
+        vibrar(60);
+        const mesa = (actual.mesa_asignada || '').trim();
+        toast('✓ ' + actual.nombre.split(' ')[0] + (mesa ? ' → mesa ' + mesa : ' registrado'));
+        cerrarFicha();
+    } catch (e) {
+        toast('No se pudo guardar. Revisa la señal.', true);
+    }
+    btn.disabled = false;
+});
+
+/* ── Escáner de códigos ───────────────────────────────────── */
+function tokenDe(texto) {
+    const t = (texto || '').trim();
+    const m = t.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+    return m ? m[0] : null;
+}
+
+async function alLeer(texto) {
+    const token = tokenDe(texto);
+    if (!token) { toast('Ese código no es de este evento.', true); return; }
+
+    let g = invitados.filter(function (x) { return x.token === token; })[0];
+    if (!g) {
+        // Puede ser un invitado dado de alta después de cargar la lista.
+        try {
+            const r = await fetch(SB_URL + '/rest/v1/invitados?token=eq.' + token + '&select=*&limit=1', { headers: SB_H });
+            const filas = await r.json();
+            if (filas.length && filas[0].evento_id === eventoId) { g = filas[0]; invitados.push(g); }
+        } catch (e) {}
+    }
+    if (!g) { toast('Ese invitado no está en la lista.', true); vibrar([60, 60, 60]); return; }
+
+    detenerEscaner();
+    vibrar(40);
+    abrirFicha(g.id);
+}
+
+async function iniciarEscaner() {
+    if (escaneando) return;
+    if (typeof Html5Qrcode === 'undefined') {
+        toast('No cargó el lector. Usa la búsqueda por nombre.', true);
+        return;
+    }
+    try {
+        lector = lector || new Html5Qrcode('lector');
+        await lector.start(
+            { facingMode: 'environment' },
+            { fps: 10, qrbox: { width: 240, height: 240 } },
+            function (txt) { alLeer(txt); },
+            function () { /* lecturas fallidas: normales, se ignoran */ }
+        );
+        escaneando = true;
+        $('btnEscanear').classList.add('oculto');
+        $('btnDetener').classList.remove('oculto');
+    } catch (e) {
+        toast('No se pudo abrir la cámara. Usa la búsqueda por nombre.', true);
+    }
+}
+
+async function detenerEscaner() {
+    if (!escaneando || !lector) return;
+    try { await lector.stop(); lector.clear(); } catch (e) {}
+    escaneando = false;
+    $('btnEscanear').classList.remove('oculto');
+    $('btnDetener').classList.add('oculto');
+}
+
+$('btnEscanear').addEventListener('click', iniciarEscaner);
+$('btnDetener').addEventListener('click', detenerEscaner);
+
+// Si la pantalla se va a segundo plano, soltar la cámara.
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) detenerEscaner();
+});
+
+cargar();
+// Refresco suave por si alguien confirma desde su teléfono durante el evento.
+setInterval(function () { if (!actual && !document.hidden) cargar(); }, 60000);
+
+})();
+</script>
+</body>
+</html>
