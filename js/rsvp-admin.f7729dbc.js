@@ -483,18 +483,23 @@
             const ms = !search || g.nombre.toLowerCase().includes(search) || (g.telefono || '').includes(search);
             return mf && ms;
         });
-        if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">No hay invitados</td></tr>'; return; }
+        if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;color:#999;">No hay invitados</td></tr>'; return; }
 
         tbody.innerHTML = filtered.map(g => {
             const s = SL[g.status] || SL.pendiente;
             const pConf = g.pases_confirmados ? `<strong>${g.pases_confirmados}</strong>` : '—';
             return `<tr>
+                <td class="celda-check"><input type="checkbox" class="sel-invitado" data-id="${g.id}"></td>
                 <td><strong>${g.nombre}</strong>${g.notas ? `<br><small style="color:#999">${g.notas}</small>` : ''}${g.mensaje ? `<br><small style="color:#6c5ce7;font-style:italic">"${g.mensaje}"</small>` : ''}</td>
                 <td><span class="badge-cat cat-${g.categoria||'otro'}">${g.categoria||'—'}</span></td>
                 <td style="text-align:center">${g.pases_asignados}</td>
                 <td style="text-align:center">${pConf}</td>
                 <td>${renderNombres(g)}</td>
-                <td>${g.mesa_asignada||'—'}</td>
+                <td class="celda-mesa">
+                    <input class="mesa-input" value="${g.mesa_asignada || ''}" placeholder="—"
+                           data-id="${g.id}" data-antes="${g.mesa_asignada || ''}"
+                           title="Escribe la mesa y sal del campo para guardar">
+                </td>
                 <td><span class="status-badge ${s.c}">${s.i} ${s.t}</span>${g.checkin_at ? `<br><small style="color:#2e9e5b;font-weight:700">✓ Llegó ${new Date(g.checkin_at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})} (${g.pases_llegaron||0})</small>` : ''}</td>
                 <td style="font-size:.78rem">${fmtDate(g.fecha_envio)}<br>${fmtDate(g.fecha_confirmacion)}</td>
                 <td><div class="action-group">
@@ -508,6 +513,82 @@
                 </div></td>
             </tr>`;
         }).join('');
+
+        engancharMesas();
+    }
+
+    /* ── Guardar la mesa al salir del campo ─────────────────────────────────── */
+    function engancharMesas() {
+        document.querySelectorAll('.mesa-input').forEach(inp => {
+            inp.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+                if (e.key === 'Escape') { inp.value = inp.dataset.antes; inp.blur(); }
+            });
+            inp.addEventListener('blur', async () => {
+                const valor = inp.value.trim();
+                if (valor === inp.dataset.antes) return;
+                inp.disabled = true;
+                const ok = await guardarMesa(inp.dataset.id, valor);
+                inp.disabled = false;
+                if (ok) {
+                    inp.dataset.antes = valor;
+                    inp.classList.add('guardado');
+                    setTimeout(() => inp.classList.remove('guardado'), 900);
+                    renderStats(); renderMesas();
+                } else {
+                    inp.value = inp.dataset.antes;
+                    showToast('No se pudo guardar la mesa');
+                }
+            });
+        });
+
+        const todos = document.getElementById('selTodos');
+        if (todos) {
+            todos.checked = false;
+            todos.onclick = () => {
+                document.querySelectorAll('.sel-invitado').forEach(c => { c.checked = todos.checked; });
+                actualizarSeleccion();
+            };
+        }
+        document.querySelectorAll('.sel-invitado').forEach(c => {
+            c.addEventListener('change', actualizarSeleccion);
+        });
+        actualizarSeleccion();
+    }
+
+    async function guardarMesa(id, valor) {
+        try {
+            const r = await fetch(`${SB_URL}/rest/v1/invitados?id=eq.${id}`, {
+                method: 'PATCH', headers: { ...SB_H, Prefer: 'return=minimal' },
+                body: JSON.stringify({ mesa_asignada: valor || null })
+            });
+            if (!r.ok) return false;
+            const g = guests.find(x => x.id === id);
+            if (g) g.mesa_asignada = valor || null;
+            return true;
+        } catch (e) { return false; }
+    }
+
+    /* ── Asignación en lote ─────────────────────────────────────────────────── */
+    function actualizarSeleccion() {
+        const n = document.querySelectorAll('.sel-invitado:checked').length;
+        const et = document.getElementById('selConteo');
+        const bt = document.getElementById('btnAsignarLote');
+        if (et) et.textContent = n ? `${n} seleccionado${n === 1 ? '' : 's'}` : 'Ninguno seleccionado';
+        if (bt) bt.disabled = !n;
+    }
+
+    async function asignarLote() {
+        const mesa = (document.getElementById('mesaLote').value || '').trim();
+        const ids = Array.from(document.querySelectorAll('.sel-invitado:checked')).map(c => c.dataset.id);
+        if (!ids.length) return;
+        const bt = document.getElementById('btnAsignarLote');
+        bt.disabled = true; bt.textContent = 'Asignando…';
+        let ok = 0;
+        for (const id of ids) { if (await guardarMesa(id, mesa)) ok++; }
+        bt.textContent = 'Asignar mesa';
+        showToast(mesa ? `✓ ${ok} a la mesa ${mesa}` : `✓ ${ok} sin mesa`);
+        renderAll();
     }
 
     // ── Modal con campos de acompanantes ─────────────────────────────────────
@@ -565,7 +646,7 @@
 
     function showError(msg) {
         const tbody = document.getElementById('guestsTableBody');
-        if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#e74c3c;">${msg}</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#e74c3c;">${msg}</td></tr>`;
     }
 
     function exportCSV() {
@@ -637,5 +718,5 @@
         window.closeGuestModal = closeGuestModal;
     });
 
-    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR, cambiarCapacidad, imprimirPlano };
+    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR, cambiarCapacidad, imprimirPlano, asignarLote };
 })();

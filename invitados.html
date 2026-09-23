@@ -119,6 +119,36 @@
     .lugar-principal.llego { border-color: #2e9e5b; background: #f2fbf5; }
     .lp-nombre { font-size: .86rem; font-weight: 600; color: #4a3c12; }
     .lp-rol { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: #a08a3e; }
+    /* ── Asignar mesa desde la tabla ── */
+    .celda-check { width: 34px; text-align: center; }
+    .sel-invitado { width: 17px; height: 17px; cursor: pointer; }
+    .mesa-input {
+        width: 68px; padding: 5px 8px; text-align: center;
+        border: 1px solid #d8d8e2; border-radius: 6px;
+        font-family: inherit; font-size: .88rem; background: #fff;
+    }
+    .mesa-input:focus { outline: none; border-color: #6c5ce7; box-shadow: 0 0 0 3px rgba(108,92,231,.15); }
+    .mesa-input.guardado { border-color: #2e9e5b; background: #f2fbf5; }
+    .mesa-input:disabled { opacity: .6; }
+
+    .barra-lote {
+        display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        background: #f6f5ff; border: 1px solid #e0dcf7;
+        border-radius: 10px; padding: 11px 14px; margin-bottom: 12px;
+    }
+    .barra-lote label { font-size: .84rem; color: #555; display: flex; align-items: center; gap: 8px; }
+    .barra-lote input {
+        width: 88px; padding: 7px 10px; border: 1px solid #d8d8e2;
+        border-radius: 7px; font-family: inherit; font-size: .9rem;
+    }
+    .barra-lote button {
+        background: #6c5ce7; color: #fff; border: none; border-radius: 7px;
+        padding: 8px 16px; font-family: inherit; font-size: .84rem; font-weight: 600; cursor: pointer;
+    }
+    .barra-lote button:disabled { background: #c9c5e8; cursor: default; }
+    #selConteo { font-size: .82rem; color: #6c5ce7; font-weight: 600; }
+    .lote-ayuda { font-size: .76rem; color: #999; margin-left: auto; }
+
 
     /* Al imprimir: solo el plano, en blanco y negro legible */
     @media print {
@@ -209,9 +239,17 @@
         <section class="service-section">
             <h2><i class="fas fa-list"></i> Lista de Invitados</h2>
             <div class="table-container">
+            <div class="barra-lote">
+                <label>Asignar a la mesa
+                    <input type="text" id="mesaLote" placeholder="ej. 3" maxlength="12">
+                </label>
+                <button id="btnAsignarLote" onclick="RSVP_ADMIN.asignarLote()" disabled>Asignar mesa</button>
+                <span id="selConteo">Ninguno seleccionado</span>
+                <span class="lote-ayuda">Marca las casillas de la izquierda, o escribe la mesa en cada fila</span>
+            </div>
                 <table class="guests-table" id="guestsTable">
                     <thead><tr>
-                        <th>Nombre</th><th>Categoria</th>
+                        <th style="width:34px;text-align:center"><input type="checkbox" id="selTodos" title="Seleccionar todos"></th><th>Nombre</th><th>Categoria</th>
                         <th style="text-align:center">Pases</th><th style="text-align:center">Conf.</th>
                         <th>Mesa</th><th>Status</th><th>Envio / Confirmacion</th>
                         <th>WhatsApp / Link</th><th>Acciones</th>
@@ -354,7 +392,7 @@
     };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/rsvp-admin.8667f8ed.js"></script>
+    <script src="js/rsvp-admin.f7729dbc.js"></script>
 <script src="js/foro7-footer.js?v=1"></script>
 <script>
 /* ── Notificaciones de datos pendientes ── */
