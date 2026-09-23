@@ -15,7 +15,7 @@ window.EVENT_CONFIG = {
 
     // ── Contacto ──────────────────────────────────────────────
     telefono:        '524779203776',   // WhatsApp FORO 7
-    contactoTitular: '',               // pendiente: el trato va por Óptica BZ
+    contactoTitular: 'Elizabeth Rodríguez', // mamá; su WhatsApp aparece como Óptica BZ
 
     // ── Paquete contratado ────────────────────────────────────
     // Paquete 1 modificado: se cambió la cobertura de la misa por
