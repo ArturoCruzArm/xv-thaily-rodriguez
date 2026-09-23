@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · XV Años de Thaily</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --acento: #9c3049; --acento2: #6d1f33; --fondo: #fdfaf5;
+        --panel: #ffffff; --texto: #2b1720; --suave: #6f5a60; --linea: #ece0dd;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+        font-family:'Montserrat',system-ui,sans-serif; background:var(--fondo);
+        color:var(--texto); line-height:1.6; padding-bottom:3rem;
+        -webkit-font-smoothing:antialiased;
+    }
+    .cabecera {
+        background:linear-gradient(135deg, var(--acento2), var(--acento));
+        color:#fff; padding:2.6rem 1.2rem 2.2rem; text-align:center;
+    }
+    .cabecera h1 { font-size:clamp(1.3rem,5vw,1.9rem); font-weight:900; }
+    .cabecera p { opacity:.85; font-size:.9rem; margin-top:.3rem; }
+    .wrap { max-width:860px; margin:0 auto; padding:0 16px; }
+    .intro {
+        background:var(--panel); border:1px solid var(--linea);
+        border-radius:12px; padding:1.1rem 1.3rem; margin:-1.4rem 0 1.8rem;
+        font-size:.9rem; color:var(--suave); box-shadow:0 4px 18px rgba(0,0,0,.06);
+    }
+    .intro strong { color:var(--texto); }
+    h2.grupo {
+        font-size:.74rem; letter-spacing:.2em; text-transform:uppercase;
+        color:var(--suave); margin:1.8rem 0 .8rem;
+    }
+    .cartas { display:grid; gap:12px; }
+    .carta {
+        display:flex; gap:14px; text-decoration:none; color:inherit;
+        background:var(--panel); border:1px solid var(--linea);
+        border-left:5px solid var(--acento);
+        border-radius:12px; padding:1.1rem 1.2rem;
+        transition:transform .15s, box-shadow .15s;
+    }
+    .carta:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.1); }
+    .carta.dia      { border-left-color:#2e9e5b; }
+    .carta.interno  { border-left-color:#636e72; }
+    .carta.publico  { border-left-color:var(--acento2); }
+    .carta-icono { font-size:1.8rem; flex:0 0 auto; line-height:1; }
+    .carta-cuerpo h3 { font-size:1.02rem; margin-bottom:.25rem; }
+    .carta-cuerpo p { font-size:.87rem; color:var(--suave); }
+    .carta-meta {
+        display:flex; gap:14px; flex-wrap:wrap; margin-top:.6rem;
+        font-size:.74rem; color:var(--suave); opacity:.85;
+    }
+    .pie { text-align:center; color:var(--suave); font-size:.78rem; margin-top:2.4rem; }
+</style>
+</head>
+<body>
+
+<div class="cabecera">
+    <h1>XV Años de Thaily</h1>
+    <p>Sábado 31 de octubre de 2026</p>
+</div>
+
+<div class="wrap">
+    <div class="intro">
+        <strong>¿Qué es cada cosa?</strong> Esta es la lista de todas las páginas de este evento.
+        Toca cualquiera para abrirla. Las de borde verde son para el <strong>día del evento</strong>;
+        la gris es <strong>solo tuya</strong> y no se comparte.
+    </div>
+
+    <h2 class="grupo">Para compartir e invitar</h2>
+    <div class="cartas">
+        <a class="carta publico" href="index.html">
+            <div class="carta-icono">💌</div>
+            <div class="carta-cuerpo">
+                <h3>La invitación</h3>
+                <p>Es lo que ven los invitados: fecha, lugar, mapa, cuenta regresiva y el formulario para confirmar. Es el enlace que se comparte por WhatsApp.</p>
+                <div class="carta-meta">
+                    <span>👤 Los invitados</span>
+                    <span>🕐 Desde ya, hasta el día del evento</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta publico" href="album.html">
+            <div class="carta-icono">📖</div>
+            <div class="carta-cuerpo">
+                <h3>Álbum digital</h3>
+                <p>La galería en línea para compartir por WhatsApp con familia y amigos. Sin límite de fotos.</p>
+                <div class="carta-meta">
+                    <span>👤 Todos</span>
+                    <span>🕐 Cuando ya están cargadas las fotos</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <h2 class="grupo">Para organizar</h2>
+    <div class="cartas">
+        <a class="carta trabajo" href="invitados.html">
+            <div class="carta-icono">📋</div>
+            <div class="carta-cuerpo">
+                <h3>Gestión de invitados</h3>
+                <p>Aquí das de alta a cada invitado con sus pases y su mesa. Genera el <b>código QR</b> de cada uno y muestra el <b>plano del salón</b> con quién se sienta dónde. También ves quién ya confirmó.</p>
+                <div class="carta-meta">
+                    <span>👤 Tú y la familia</span>
+                    <span>🕐 Antes del evento, para organizar</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta trabajo" href="datos.html">
+            <div class="carta-icono">✏️</div>
+            <div class="carta-cuerpo">
+                <h3>Datos del evento</h3>
+                <p>El formulario donde se capturan lugar, hora, padrinos, vestimenta y demás. Lo que guardas aquí <b>aparece solo</b> en la invitación, sin tener que rehacerla.</p>
+                <div class="carta-meta">
+                    <span>👤 Tú y la familia</span>
+                    <span>🕐 Conforme se van definiendo las cosas</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta trabajo" href="selector.html">
+            <div class="carta-icono">📸</div>
+            <div class="carta-cuerpo">
+                <h3>Selector de fotos</h3>
+                <p>Después de la sesión y del evento, aquí la familia marca qué fotos quiere <b>impresas</b>, cuál va en la <b>ampliación</b> y cuáles en el álbum digital.</p>
+                <div class="carta-meta">
+                    <span>👤 La familia</span>
+                    <span>🕐 Cuando ya están cargadas las fotos</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <h2 class="grupo">El día del evento</h2>
+    <div class="cartas">
+        <a class="carta dia" href="acceso.html">
+            <div class="carta-icono">🚪</div>
+            <div class="carta-cuerpo">
+                <h3>Control de acceso</h3>
+                <p>Para usar <b>en la puerta el día del evento</b>. Escaneas el QR del invitado con la cámara y te dice su nombre y su mesa en grande. Registras cuántos llegaron de verdad. También puedes buscar por nombre.</p>
+                <div class="carta-meta">
+                    <span>👤 Quien recibe en la entrada</span>
+                    <span>🕐 El día del evento</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <h2 class="grupo">Documentos</h2>
+    <div class="cartas">
+        <a class="carta papel" href="contrato.html">
+            <div class="carta-icono">📄</div>
+            <div class="carta-cuerpo">
+                <h3>Contrato</h3>
+                <p>El contrato del servicio con todo el desglose. Se puede guardar como PDF desde el botón de imprimir.</p>
+                <div class="carta-meta">
+                    <span>👤 Tú y quien contrata</span>
+                    <span>🕐 Referencia</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta papel" href="logistica.html">
+            <div class="carta-icono">🗓️</div>
+            <div class="carta-cuerpo">
+                <h3>Logística</h3>
+                <p>Resumen para el cliente: fechas importantes, estado de pagos y la lista de lo que falta.</p>
+                <div class="carta-meta">
+                    <span>👤 Quien contrata</span>
+                    <span>🕐 Todo el proceso</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta papel" href="preparativos.html">
+            <div class="carta-icono">✅</div>
+            <div class="carta-cuerpo">
+                <h3>Preparativos</h3>
+                <p>Lista de lo que hay que tener listo para la sesión y para el día del evento.</p>
+                <div class="carta-meta">
+                    <span>👤 La festejada y su familia</span>
+                    <span>🕐 Antes del evento</span>
+                </div>
+            </div>
+        </a>
+        <a class="carta interno" href="produccion.html">
+            <div class="carta-icono">🎬</div>
+            <div class="carta-cuerpo">
+                <h3>Producción</h3>
+                <p>Hoja interna de FORO 7: horarios, equipo, checklists y avisos. <b>No se comparte con el cliente.</b></p>
+                <div class="carta-meta">
+                    <span>👤 Solo tú</span>
+                    <span>🕐 Antes y durante el evento</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <p class="pie">FORO 7 · Fotografía, Video e Invitaciones Web · 477 920 3776</p>
+</div>
+
+<script src="visitas.js"></script>
+</body>
+</html>

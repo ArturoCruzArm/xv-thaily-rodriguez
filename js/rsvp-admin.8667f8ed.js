@@ -29,6 +29,7 @@
         ]);
         guests = await gR.json();
         const acomps = await aR.json();
+        cargarProtagonistas(eid);
         // Adjuntar acompanantes a cada invitado
         guests.forEach(g => {
             g._acomps = acomps.filter(a => a.invitado_id === g.id).sort((a,b) => a.orden - b.orden);
@@ -218,6 +219,31 @@
 
     const CAP_KEY = 'foro7_cap_mesa_' + (EVENTO_SLUG || 'x');
 
+    /* Nombres de la mesa principal: el festejado y sus papás, tomados de
+       eventos_config. Se pueden sumar invitados poniéndoles como mesa
+       "principal", "novios", "honor" o "festejados". */
+    let principal = { titulo: 'Mesa principal', nombres: [] };
+
+    const ALIAS_PRINCIPAL = ['principal', 'novios', 'honor', 'festejados', 'festejado', 'quinceanera', 'quinceañera'];
+
+    function esMesaPrincipal(m) {
+        return ALIAS_PRINCIPAL.indexOf((m || '').trim().toLowerCase()) !== -1;
+    }
+
+    async function cargarProtagonistas(eid) {
+        try {
+            const r = await fetch(`${SB_URL}/rest/v1/eventos_config?evento_id=eq.${eid}&seccion=eq.protagonistas&select=datos&limit=1`, { headers: SB_H });
+            const [fila] = await r.json();
+            const d = (fila && fila.datos) || {};
+            const nombres = [];
+            if (d.nombre) nombres.push({ nombre: d.nombre, rol: cfg.eventName && /3 A/i.test(cfg.eventName) ? 'Festejado' : 'Festejada' });
+            if (d.nombre_padre) nombres.push({ nombre: d.nombre_padre, rol: 'Papá' });
+            if (d.nombre_madre) nombres.push({ nombre: d.nombre_madre, rol: 'Mamá' });
+            principal.nombres = nombres;
+            renderMesas();
+        } catch (e) { /* si falla, la mesa principal sale solo con lo asignado */ }
+    }
+
     function capacidadMesa() {
         const n = parseInt(localStorage.getItem(CAP_KEY), 10);
         return (!isNaN(n) && n >= 2 && n <= 20) ? n : 10;
@@ -237,7 +263,8 @@
         const mapa = {};
         guests.forEach(g => {
             if (g.asiste === false || g.status === 'declinada') return;   // no ocupa lugar
-            const m = (g.mesa_asignada || '').trim() || '__sin__';
+            let m = (g.mesa_asignada || '').trim() || '__sin__';
+            if (esMesaPrincipal(m)) m = '__principal__';
             (mapa[m] = mapa[m] || []).push(g);
         });
         return mapa;
@@ -245,6 +272,8 @@
 
     function ordenMesas(claves) {
         return claves.sort((a, b) => {
+            if (a === '__principal__') return -1;     // siempre primero
+            if (b === '__principal__') return 1;
             if (a === '__sin__') return 1;
             if (b === '__sin__') return -1;
             const na = parseInt(a, 10), nb = parseInt(b, 10);
@@ -273,7 +302,33 @@
 
         let totalPersonas = 0, mesasLlenas = 0, sobrecupo = 0;
 
+        // La mesa principal existe aunque nadie esté asignado a ella
+        if (claves.indexOf('__principal__') === -1 && principal.nombres.length) {
+            claves.unshift('__principal__');
+            mapa.__principal__ = [];
+        }
+
         cont.innerHTML = claves.map(m => {
+            if (m === '__principal__') {
+                const extra = [];
+                (mapa.__principal__ || []).forEach(g => {
+                    ocupantes(g).forEach(n => extra.push({ nombre: n, llego: !!g.checkin_at, rol: '' }));
+                });
+                const gente = principal.nombres.map(x => ({ nombre: x.nombre, rol: x.rol, llego: false })).concat(extra);
+                totalPersonas += gente.length;
+                const lugares = gente.map(p =>
+                    `<span class="lugar-principal${p.llego ? ' llego' : ''}">
+                        <span class="lp-nombre">${p.nombre}</span>
+                        ${p.rol ? `<span class="lp-rol">${p.rol}</span>` : ''}
+                    </span>`).join('');
+                return `<div class="plano-mesa principal">
+                    <div class="mesa-larga">
+                        <div class="mesa-larga-et">👑 ${principal.titulo}</div>
+                        <div class="mesa-larga-lugares">${lugares || '<em style="color:#aaa">Sin nombres capturados</em>'}</div>
+                    </div>
+                    <div class="plano-pie">${gente.length} ${gente.length === 1 ? 'lugar' : 'lugares'}</div>
+                </div>`;
+            }
             const lista = mapa[m];
             let gente = [];
             lista.forEach(g => {

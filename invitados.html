@@ -38,6 +38,96 @@
         background: #fff; border: 1px solid #e6e6ee; border-radius: 10px;
         padding: 12px 14px; margin-bottom: 12px;
     }
+    .plano-barra label { font-size: .84rem; color: #555; display: flex; align-items: center; gap: 8px; }
+    .plano-barra input {
+        width: 68px; padding: 7px 9px; border: 1px solid #d8d8e2;
+        border-radius: 7px; font-family: inherit; font-size: .9rem;
+    }
+    .btn-plano {
+        background: #6c5ce7; color: #fff; border: none; border-radius: 7px;
+        padding: 9px 16px; font-family: inherit; font-size: .84rem; font-weight: 600; cursor: pointer;
+    }
+    .plano-leyenda { display: flex; gap: 14px; margin-left: auto; font-size: .76rem; color: #777; }
+    .plano-leyenda span { display: flex; align-items: center; gap: 5px; }
+    .plano-leyenda .pt {
+        width: 12px; height: 12px; border-radius: 50%;
+        border: 2px solid #c9c9d6; background: #fff; display: inline-block;
+    }
+    .plano-leyenda .pt.ocupada { background: #6c5ce7; border-color: #6c5ce7; }
+    .plano-leyenda .pt.llego   { background: #2e9e5b; border-color: #2e9e5b; }
+
+    .plano-resumen { font-size: .88rem; color: #666; margin-bottom: 1rem; }
+    .plano-resumen .alerta, .alerta { color: #d63031; }
+
+    .mesas-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(212px, 1fr)); gap: 18px;
+    }
+    .plano-mesa {
+        background: #fff; border: 1px solid #e6e6ee; border-radius: 12px;
+        padding: 14px 10px; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+    }
+    .plano-mesa.llena    { border-color: #2e9e5b; }
+    .plano-mesa.excedida { border-color: #d63031; }
+    .plano-mesa.sin      { border-color: #fdcb6e; background: #fffdf5; }
+    .plano-mesa.vacia    { opacity: .75; }
+
+    .plano-figura { position: relative; width: 176px; height: 176px; margin: 0 auto 10px; }
+    .plato {
+        position: absolute; inset: 30px; border-radius: 50%;
+        background: #f3f1fb; border: 2px solid #ddd8f5;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .plano-mesa.sin .plato { background: #fdf6e3; border-color: #f0dfae; }
+    .plato-num   { font-size: 1.5rem; font-weight: 800; color: #4b3fb3; line-height: 1; }
+    .plano-mesa.sin .plato-num { font-size: .95rem; color: #9a7b18; }
+    .plato-gente { font-size: .74rem; color: #888; margin-top: 2px; }
+
+    .silla {
+        position: absolute; top: 50%; left: 50%;
+        width: 18px; height: 18px; margin: -9px 0 0 -9px;
+        border-radius: 50%; background: #fff; border: 2px solid #ccc9da;
+        transform-origin: center;
+    }
+    .silla.ocupada { background: #6c5ce7; border-color: #6c5ce7; }
+    .silla.ocupada.llego { background: #2e9e5b; border-color: #2e9e5b; }
+
+    .plano-pie { text-align: center; font-size: .78rem; color: #888; margin-bottom: .5rem; }
+    .plano-lista { list-style: none; margin: 0; padding: 0; border-top: 1px dashed #eee; padding-top: .5rem; }
+    .plano-lista li {
+        font-size: .8rem; color: #444; padding: 2px 0;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .plano-lista li.llego { color: #2e9e5b; font-weight: 600; }
+    .plano-lista li.llego::before { content: '✓ '; }
+    .plano-lista li.anon { color: #aaa; }
+    /* ── Mesa principal: los festejados ── */
+    .plano-mesa.principal { grid-column: 1 / -1; border-color: #c9a227; background: #fffdf4; }
+    .mesa-larga {
+        border: 2px solid #c9a227; background: #fff8e3;
+        border-radius: 14px; padding: 16px 18px; margin-bottom: .6rem;
+    }
+    .mesa-larga-et {
+        font-size: .76rem; font-weight: 700; letter-spacing: .14em;
+        text-transform: uppercase; color: #8a6d12; margin-bottom: .8rem; text-align: center;
+    }
+    .mesa-larga-lugares { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .lugar-principal {
+        display: flex; flex-direction: column; align-items: center;
+        background: #fff; border: 1px solid #ecdfae; border-radius: 9px;
+        padding: 8px 14px; min-width: 110px;
+    }
+    .lugar-principal.llego { border-color: #2e9e5b; background: #f2fbf5; }
+    .lp-nombre { font-size: .86rem; font-weight: 600; color: #4a3c12; }
+    .lp-rol { font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: #a08a3e; }
+
+    /* Al imprimir: solo el plano, en blanco y negro legible */
+    @media print {
+        body.solo-plano > *:not(.main-content) { display: none !important; }
+        body.solo-plano .section:not(:has(#mesasGrid)) { display: none !important; }
+        body.solo-plano .plano-barra, body.solo-plano .nav-links { display: none !important; }
+        body.solo-plano .mesas-grid { grid-template-columns: repeat(3, 1fr); }
+        body.solo-plano .plano-mesa { break-inside: avoid; box-shadow: none; }
+    }
 
     /* ── Modal de código QR ── */
     #qrModal {
@@ -69,6 +159,7 @@
         <header class="service-header" style="background: linear-gradient(135deg, #55efc4, #00b894);">
             <div class="service-icon"><i class="fas fa-users"></i></div>
             <h1>Gestión de Invitados</h1>
+            <p style="margin-top:.4rem"><a href="panel.html" style="color:inherit;opacity:.8;font-size:.85rem">🧭 Ver todas las páginas del evento</a></p>
             <p>XV Años Thaily Rodríguez</p>
         </header>
         <section class="service-section">
@@ -263,7 +354,7 @@
     };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="js/rsvp-admin-3.js"></script>
+    <script src="js/rsvp-admin.8667f8ed.js"></script>
 <script src="js/foro7-footer.js?v=1"></script>
 <script>
 /* ── Notificaciones de datos pendientes ── */
