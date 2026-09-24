@@ -422,5 +422,24 @@
   document.addEventListener('DOMContentLoaded',checkNotif);
 })();
 </script>
+
+<!-- Acceso directo al lector, siempre visible -->
+<a href="acceso.html" class="fab-acceso" title="Abrir el lector de códigos para la entrada">
+    <i class="fas fa-qrcode"></i>
+    <span>Escanear<br>en la puerta</span>
+</a>
+<style>
+.fab-acceso {
+    position: fixed; right: 18px; bottom: 18px; z-index: 9000;
+    display: flex; align-items: center; gap: 10px;
+    background: #2e9e5b; color: #fff; text-decoration: none;
+    padding: 13px 18px; border-radius: 999px;
+    box-shadow: 0 8px 26px rgba(46,158,91,.45);
+    font-size: .78rem; font-weight: 700; line-height: 1.2;
+}
+.fab-acceso i { font-size: 1.3rem; }
+.fab-acceso:hover { background: #26824a; }
+@media (max-width: 600px) { .fab-acceso span { display: none; } .fab-acceso { padding: 16px; } }
+</style>
 </body>
 </html>

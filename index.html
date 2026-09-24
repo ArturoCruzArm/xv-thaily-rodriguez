@@ -211,6 +211,33 @@
         }
         .por-venir strong { color: var(--granate); display: block; margin-bottom: .5rem; font-size: 1.05rem; }
 
+        /* ── Pase del invitado (solo con ?inv=) ─────────────── */
+        .pase { max-width: 380px; margin: 0 auto; }
+        .pase-tarjeta {
+            background: #fff; border-radius: 16px; overflow: hidden;
+            border: 1px solid var(--linea);
+            box-shadow: 0 14px 40px rgba(0,0,0,.14);
+        }
+        .pase-cabecera {
+            background: var(--granate); color: #fff;
+            padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .pase-cabecera .et { font-size: .66rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+        .pase-cabecera .num { font-family: 'Great Vibes', cursive; font-size: 1.7rem; line-height: 1; }
+        .pase-cuerpo { padding: 22px 18px 8px; text-align: center; }
+        .pase-nombre { font-size: 1.2rem; font-weight: 600; line-height: 1.3; color: var(--texto); }
+        .pase-datos { display: flex; justify-content: center; gap: 10px; margin: 16px 0 6px; flex-wrap: wrap; }
+        .pase-dato { background: var(--vino-nube); border-radius: 10px; padding: 9px 16px; min-width: 88px; }
+        .pase-dato .k { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--texto-suave); }
+        .pase-dato .v { font-size: 1.2rem; font-weight: 700; color: var(--granate); line-height: 1.2; }
+        #paseQR { display: flex; justify-content: center; padding: 14px 0 4px; }
+        #paseQR img, #paseQR canvas { border-radius: 8px; }
+        .pase-pie {
+            border-top: 1px dashed var(--linea); margin: 8px 16px 0; padding: 13px 4px 18px;
+            font-size: .8rem; color: var(--texto-suave);
+        }
+        .pase-nota { text-align: center; color: var(--texto-suave); font-size: .82rem; margin-top: 1.1rem; }
+
         /* Acciones de la invitación: calendario y compartir */
         .acciones-invitacion {
             display: flex; flex-wrap: wrap; gap: 12px;
@@ -423,6 +450,7 @@
     <nav class="nav-sticky">
         <a href="#cuenta">Faltan</a>
         <a href="#detalles">Dónde y cuándo</a>
+        <a href="#pase" id="navPase" hidden>Mi pase</a>
         <a href="#familia">Mi familia</a>
         <a href="#galeria">Galería</a>
         <a href="#rsvp">Confirmar</a>
@@ -484,6 +512,41 @@
                 <button class="btn-accion" id="btnCompartir">🔗 Compartir invitación</button>
             </div>
         </div></section>
+
+    <!-- ═════════ TU PASE (solo con ?inv=) ═════════ -->
+    <section class="info-section" id="pase" hidden>
+        <div class="container">
+            <h2 class="section-title">Tu pase</h2>
+            <p style="text-align:center;color:var(--texto-suave);margin-top:-.4rem;">Muéstralo en la entrada</p>
+            <div class="decorative-line"></div>
+
+            <div class="pase">
+                <div class="pase-tarjeta">
+                    <div class="pase-cabecera">
+                        <span class="et">Pase de acceso</span>
+                        <span class="num">XV</span>
+                    </div>
+                    <div class="pase-cuerpo">
+                        <div class="pase-nombre" id="paseNombre">—</div>
+                        <div class="pase-datos">
+                            <div class="pase-dato">
+                                <div class="k">Lugares</div>
+                                <div class="v" id="paseLugares">—</div>
+                            </div>
+                            <div class="pase-dato" id="paseMesaCaja" hidden>
+                                <div class="k">Mesa</div>
+                                <div class="v" id="paseMesa">—</div>
+                            </div>
+                        </div>
+                        <div id="paseQR"></div>
+                    </div>
+                    <div class="pase-pie">Sábado 31 de octubre de 2026</div>
+                </div>
+                <p class="pase-nota">Guarda una captura o abre este enlace el día del evento 🤍</p>
+            </div>
+        </div>
+    </section>
+
 
     <!-- ═════════ FAMILIA Y PADRINOS ═════════ -->
     <section class="info-section nube" id="familia">
@@ -595,6 +658,7 @@
             style="position:fixed;bottom:20px;right:20px;z-index:9999;width:48px;height:48px;border-radius:50%;background:rgba(109,31,51,.88);backdrop-filter:blur(10px);border:1.5px solid rgba(232,207,122,.5);color:#e8cf7a;font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;">&#9835;</button>
 
 <script>window.EVENTO_SLUG='xv-thaily-rodriguez';</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="js/photos.3afdddb9.js"></script>
 <script src="js/evento-loader.js"></script>
 <script src="visitas.js"></script>
@@ -959,7 +1023,7 @@
     if (!token) return;
     const SB_URL  = 'https://nzpujmlienzfetqcgsxz.supabase.co';
     const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56cHVqbWxpZW56ZmV0cWNnc3h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2ODYzMzYsImV4cCI6MjA5MDI2MjMzNn0.xl3lsb-KYj5tVLKTnzpbsdEGoV9ySnswH4eyRuyEH1s';
-    fetch(SB_URL + '/rest/v1/invitados?token=eq.' + encodeURIComponent(token) + '&select=nombre,pases_asignados&limit=1',
+    fetch(SB_URL + '/rest/v1/invitados?token=eq.' + encodeURIComponent(token) + '&select=nombre,pases_asignados,mesa_asignada&limit=1',
           { headers: { apikey: SB_ANON, Authorization: 'Bearer ' + SB_ANON } })
         .then(function (r) { return r.json(); })
         .then(function (rows) {
@@ -976,6 +1040,33 @@
             if (gEl) { gEl.textContent = g.nombre; gEl.style.display = 'block'; }
             if (pEl) { pEl.textContent = '🎟 ' + g.pases_asignados + ' ' + (g.pases_asignados === 1 ? 'pase' : 'pases'); pEl.style.display = 'block'; }
             if (btn) btn.textContent = 'Ver mi Invitación';
+
+            /* Su pase, con el código para la entrada. Es el mismo
+               enlace que está viendo: sirve para entrar y para que
+               en la puerta registren su llegada. */
+            const sec = document.getElementById('pase');
+            if (sec) {
+                document.getElementById('paseNombre').textContent = g.nombre;
+                document.getElementById('paseLugares').textContent = g.pases_asignados;
+                const mesa = (g.mesa_asignada || '').trim();
+                if (mesa) {
+                    document.getElementById('paseMesa').textContent = mesa;
+                    document.getElementById('paseMesaCaja').hidden = false;
+                }
+                const caja = document.getElementById('paseQR');
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(caja, {
+                        text: location.origin + location.pathname + '?inv=' + token,
+                        width: 190, height: 190, correctLevel: QRCode.CorrectLevel.M
+                    });
+                } else {
+                    caja.innerHTML = '<p style="color:#999;font-size:.85rem">Vuelve a abrir el enlace ' +
+                                     'para ver tu código.</p>';
+                }
+                sec.hidden = false;
+                const nav = document.getElementById('navPase');
+                if (nav) nav.hidden = false;
+            }
         })
         .catch(function () {});
 })();
