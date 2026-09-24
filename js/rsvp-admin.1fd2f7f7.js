@@ -310,11 +310,30 @@
 
         cont.innerHTML = claves.map(m => {
             if (m === '__principal__') {
-                const extra = [];
+                /* Los protagonistas ya vienen de eventos_config. Si
+                   además hay invitados asignados a esta mesa, se
+                   fusionan por nombre para no repetir lugares. */
+                const clave = s => (s || '').toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/\s+/g, ' ').trim();
+
+                const gente = principal.nombres.map(x => ({ nombre: x.nombre, rol: x.rol, llego: false }));
+                const porNombre = {};
+                gente.forEach((p, i) => { porNombre[clave(p.nombre)] = i; });
+
                 (mapa.__principal__ || []).forEach(g => {
-                    ocupantes(g).forEach(n => extra.push({ nombre: n, llego: !!g.checkin_at, rol: '' }));
+                    ocupantes(g).forEach(n => {
+                        const k = clave(n);
+                        if (n && porNombre[k] !== undefined) {
+                            // Ya está como protagonista: solo se marca su llegada
+                            if (g.checkin_at) gente[porNombre[k]].llego = true;
+                            return;
+                        }
+                        const nuevo = { nombre: n, llego: !!g.checkin_at, rol: '' };
+                        if (n) porNombre[k] = gente.length;
+                        gente.push(nuevo);
+                    });
                 });
-                const gente = principal.nombres.map(x => ({ nombre: x.nombre, rol: x.rol, llego: false })).concat(extra);
                 totalPersonas += gente.length;
                 const lugares = gente.map(p =>
                     `<span class="lugar-principal${p.llego ? ' llego' : ''}">
