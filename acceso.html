@@ -146,6 +146,12 @@
 
     .pie { text-align:center; color:var(--suave); font-size:.72rem; margin-top:24px; }
     .pie a { color:var(--texto); }
+    .caja-error {
+        background:rgba(192,57,43,.14); border:1px solid var(--error);
+        border-radius:12px; padding:14px 16px; margin-bottom:12px; font-size:.88rem;
+    }
+    .caja-error strong { display:block; color:#f5b0a8; margin-bottom:4px; font-size:.95rem; }
+    .caja-error span { color:var(--suave); }
     .oculto { display:none !important; }
 </style>
 </head>
@@ -166,6 +172,7 @@
     <!-- ── Vista principal ── -->
     <div id="vistaPrincipal">
         <button class="btn principal" id="btnEscanear">📷 Escanear código</button>
+        <div id="cajaError" class="caja-error oculto"></div>
         <div id="lector"></div>
         <button class="btn chico oculto" id="btnDetener">Detener cámara</button>
 
@@ -234,6 +241,15 @@ function toast(msg, esError) {
     clearTimeout(t._t);
     t._t = setTimeout(function () { t.classList.remove('show'); }, 2600);
 }
+
+function mostrarError(titulo, detalle) {
+    const c = $('cajaError');
+    c.innerHTML = '<strong>' + titulo + '</strong><span>' + (detalle || '') + '</span>';
+    c.classList.remove('oculto');
+    vibrar([60, 60, 60]);
+}
+
+function ocultarError() { $('cajaError').classList.add('oculto'); }
 
 function vibrar(ms) { if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} } }
 
@@ -412,24 +428,79 @@ async function alLeer(texto) {
 
 async function iniciarEscaner() {
     if (escaneando) return;
-    if (typeof Html5Qrcode === 'undefined') {
-        toast('No cargó el lector. Usa la búsqueda por nombre.', true);
+    ocultarError();
+
+    if (!window.isSecureContext) {
+        mostrarError('La cámara solo funciona en https.',
+                     'Abre la página con https:// al inicio.');
         return;
     }
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        mostrarError('Este navegador no da acceso a la cámara.',
+                     'Prueba con Safari o Chrome actualizados, o usa la búsqueda por nombre.');
+        return;
+    }
+    if (typeof Html5Qrcode === 'undefined') {
+        mostrarError('No cargó el lector de códigos.',
+                     'Revisa la conexión y recarga. Mientras tanto, busca por nombre.');
+        return;
+    }
+
+    $('btnEscanear').textContent = 'Abriendo cámara…';
+    $('btnEscanear').disabled = true;
+
     try {
+        /* iOS pide el permiso aquí: hay que solicitarlo dentro del
+           toque, antes de arrancar el lector. El flujo se cierra
+           enseguida; solo sirve para que salga el diálogo. */
+        const prueba = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } }, audio: false
+        });
+        prueba.getTracks().forEach(function (t) { t.stop(); });
+
         lector = lector || new Html5Qrcode('lector');
+
+        /* Elegir la cámara trasera por id: en iPhone es más fiable
+           que pedir facingMode a secas. */
+        let camara = { facingMode: 'environment' };
+        try {
+            const camaras = await Html5Qrcode.getCameras();
+            if (camaras && camaras.length) {
+                const trasera = camaras.find(function (c) {
+                    return /back|rear|tras|environment/i.test(c.label || '');
+                });
+                camara = (trasera || camaras[camaras.length - 1]).id;
+            }
+        } catch (e) { /* si no se pueden listar, queda facingMode */ }
+
         await lector.start(
-            { facingMode: 'environment' },
-            { fps: 10, qrbox: { width: 240, height: 240 } },
+            camara,
+            { fps: 10, qrbox: { width: 240, height: 240 }, aspectRatio: 1 },
             function (txt) { alLeer(txt); },
             function () { /* lecturas fallidas: normales, se ignoran */ }
         );
+
         escaneando = true;
         $('btnEscanear').classList.add('oculto');
         $('btnDetener').classList.remove('oculto');
     } catch (e) {
-        toast('No se pudo abrir la cámara. Usa la búsqueda por nombre.', true);
+        const nombre = (e && (e.name || e.message)) || '';
+        if (/NotAllowed|Permission|denied/i.test(nombre)) {
+            mostrarError('No diste permiso a la cámara.',
+                         'En iPhone: toca «aA» junto a la dirección → Ajustes del sitio web → Cámara → Permitir. ' +
+                         'En Android: el candado junto a la dirección → Permisos → Cámara.');
+        } else if (/NotFound|Overconstrained/i.test(nombre)) {
+            mostrarError('No se encontró ninguna cámara.',
+                         'Usa la búsqueda por nombre de aquí abajo.');
+        } else if (/NotReadable|TrackStart|AbortError/i.test(nombre)) {
+            mostrarError('Otra aplicación está usando la cámara.',
+                         'Cierra la cámara o la videollamada que tengas abierta y vuelve a intentar.');
+        } else {
+            mostrarError('No se pudo abrir la cámara.', String(nombre || e));
+        }
     }
+    $('btnEscanear').textContent = '📷 Escanear código';
+    $('btnEscanear').disabled = false;
 }
 
 async function detenerEscaner() {
