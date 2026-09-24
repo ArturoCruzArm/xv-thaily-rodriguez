@@ -18,6 +18,8 @@ Ver D:\\eventos\\HERRAMIENTAS_FOTOS.md para el convertidor JPEG -> WebP.
 import os
 import re
 import sys
+import glob
+import hashlib
 
 try:
     from urllib.parse import quote          # py3
@@ -97,10 +99,34 @@ def main():
             bloque(archivos),
         ))
 
-    print('OK  %d fotos (%d con miniatura) -> %s' % (len(archivos), con_thumb, SALIDA))
+    # El nombre lleva un hash del contenido: Cloudflare cachea un año
+    # y el ?v= no lo invalida, así que cada cambio necesita URL nueva.
+    with open(SALIDA, 'r', encoding='utf-8') as fh:
+        firma = hashlib.sha1(fh.read().encode('utf-8')).hexdigest()[:8]
+    nuevo = os.path.join(AQUI, 'js', 'photos.%s.js' % firma)
+    for viejo in glob.glob(os.path.join(AQUI, 'js', 'photos*.js')):
+        if os.path.abspath(viejo) != os.path.abspath(nuevo):
+            os.remove(viejo)
+    if not os.path.exists(nuevo):
+        os.rename(SALIDA, nuevo)
+    nombre_js = os.path.basename(nuevo)
+
+    # Actualizar las páginas que lo cargan
+    for pagina in ('index.html', 'selector.html', 'album.html', 'sw.js'):
+        ruta = os.path.join(AQUI, pagina)
+        if not os.path.exists(ruta):
+            continue
+        with open(ruta, 'r', encoding='utf-8') as fh:
+            txt = fh.read()
+        nvo = re.sub(r'js/photos[^"\']*\.js', 'js/' + nombre_js, txt)
+        if nvo != txt:
+            with open(ruta, 'w', encoding='utf-8', newline='') as fh:
+                fh.write(nvo)
+
+    print('OK  %d fotos (%d con miniatura) -> js/%s' % (len(archivos), con_thumb, nombre_js))
     if archivos and con_thumb < len(archivos):
         print('AVISO: %d fotos sin miniatura en img/thumb/' % (len(archivos) - con_thumb))
-    print('Recuerda subir la version del script en los HTML:  js/photos.js?v=N')
+    print('Las paginas que lo cargan ya quedaron apuntando al archivo nuevo.')
     return 0
 
 
