@@ -649,6 +649,61 @@
         if (tbody) tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:#e74c3c;">${msg}</td></tr>`;
     }
 
+    /* ── Lista imprimible ─────────────────────────────────────────────────────
+       Abre el diálogo de impresión del navegador, que también permite
+       "Guardar como PDF". Es la lista que se lleva en papel a la puerta. */
+    function imprimirLista() {
+        const ordenados = guests.slice().sort((a, b) => {
+            const ma = (a.mesa_asignada || '~').toString(), mb = (b.mesa_asignada || '~').toString();
+            const na = parseInt(ma, 10), nb = parseInt(mb, 10);
+            if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+            if (ma !== mb) return ma.localeCompare(mb, 'es');
+            return a.nombre.localeCompare(b.nombre, 'es');
+        });
+
+        const filas = ordenados.map(g => {
+            const acomp = (g._acomps || []).filter(a => a.nombre).map(a => a.nombre).join(', ');
+            const pases = g.pases_confirmados || g.pases_asignados || 1;
+            const est = (SL[g.status] || SL.pendiente).t;
+            return `<tr>
+                <td class="c">${g.mesa_asignada || '—'}</td>
+                <td><strong>${g.nombre}</strong>${acomp ? `<br><span class="ac">${acomp}</span>` : ''}</td>
+                <td class="c">${pases}</td>
+                <td>${est}</td>
+                <td class="c">${g.checkin_at ? '✓' : '☐'}</td>
+            </tr>`;
+        }).join('');
+
+        const total = guests.reduce((n, g) => n + (g.pases_confirmados || g.pases_asignados || 0), 0);
+        const w = window.open('', '_blank');
+        if (!w) { showToast('El navegador bloqueó la ventana de impresión'); return; }
+        w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+            <title>Lista de invitados</title>
+            <style>
+              body { font-family: system-ui, sans-serif; padding: 24px; color: #222; }
+              h1 { font-size: 1.2rem; margin-bottom: 2px; }
+              .sub { color: #666; font-size: .85rem; margin-bottom: 16px; }
+              table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+              th { text-align: left; border-bottom: 2px solid #333; padding: 6px 8px; font-size: .72rem;
+                   text-transform: uppercase; letter-spacing: .08em; }
+              td { border-bottom: 1px solid #ddd; padding: 6px 8px; vertical-align: top; }
+              td.c, th.c { text-align: center; }
+              .ac { color: #666; font-size: .76rem; }
+              tr { break-inside: avoid; }
+              @media print { body { padding: 0; } }
+            </style></head><body>
+            <h1>${cfg.eventName || 'Lista de invitados'}</h1>
+            <div class="sub">${cfg.eventDate || ''} · ${guests.length} invitados · ${total} personas</div>
+            <table>
+              <thead><tr><th class="c">Mesa</th><th>Nombre y acompañantes</th>
+                <th class="c">Pases</th><th>Estado</th><th class="c">Llegó</th></tr></thead>
+              <tbody>${filas}</tbody>
+            </table>
+            </body></html>`);
+        w.document.close();
+        setTimeout(() => { w.focus(); w.print(); }, 350);
+    }
+
     function exportCSV() {
         const headers = ['Nombre','Telefono','Categoria','Pases','Conf.','Acompanantes','Mesa','Status','Mensaje'];
         const rows = guests.map(g => [
@@ -711,12 +766,9 @@
             });
         }
 
-        const btnExport = document.querySelector('[onclick="exportToExcel()"]');
-        if (btnExport) { btnExport.onclick = exportCSV; btnExport.innerHTML = '<i class="fas fa-file-csv"></i> Exportar CSV'; }
-
         window.openAddGuestModal = openAddGuestModal;
         window.closeGuestModal = closeGuestModal;
     });
 
-    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR, cambiarCapacidad, imprimirPlano, asignarLote };
+    window.RSVP_ADMIN = { sendWhatsApp, copyLink, deleteGuest, openEdit, confirmManual, mostrarQR, descargarQR, cerrarQR, cambiarCapacidad, imprimirPlano, asignarLote, exportCSV, imprimirLista };
 })();
