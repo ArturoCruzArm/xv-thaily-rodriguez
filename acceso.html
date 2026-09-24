@@ -69,8 +69,19 @@
     .btn.chico { padding:12px; font-size:.8rem; }
 
     /* ── Escáner ── */
-    #lector { width:100%; border-radius:12px; overflow:hidden; background:#000; margin-bottom:12px; }
-    #lector:empty { display:none; }
+    /* El contenedor necesita altura propia: el <video> que inserta la
+       librería no la impone y el div se quedaba en 0 px. */
+    #lector { width:100%; border-radius:12px; overflow:hidden; background:#000; }
+    #lector:empty { display:none; margin:0; }
+    #lector.activo { min-height:300px; margin-bottom:12px; }
+    #lector video {
+        width:100% !important; height:auto !important;
+        display:block; border-radius:12px; object-fit:cover;
+    }
+    /* La librería deja un canvas de trabajo y una imagen de ayuda
+       que no tienen por qué verse. */
+    #lector canvas, #lector img { display:none !important; }
+    #lector > div { border:none !important; }
 
     /* ── Búsqueda manual ── */
     .buscador { position:relative; margin-bottom:12px; }
@@ -161,7 +172,7 @@
     <div class="marcador">
         <div class="m-caja llegaron"><span class="m-num" id="mLlegaron">0</span><span class="m-lbl">Llegaron</span></div>
         <div class="m-caja faltan"><span class="m-num" id="mFaltan">0</span><span class="m-lbl">Faltan</span></div>
-        <div class="m-caja"><span class="m-num" id="mPersonas">0</span><span class="m-lbl">Personas</span></div>
+        <div class="m-caja"><span class="m-num" id="mPersonas">0</span><span class="m-lbl">Esperadas</span></div>
     </div>
 </header>
 
@@ -273,15 +284,22 @@ async function cargar() {
 }
 
 function pintarMarcador() {
-    let llegaron = 0, personas = 0, esperados = 0;
+    /* Todo en personas, igual que el panel: una invitación de 10
+       pases son 10 personas que hay que ver entrar. */
+    let llegaron = 0, esperadas = 0;
     invitados.forEach(function (g) {
-        if (g.checkin_at) { llegaron++; personas += (g.pases_llegaron || 0); }
-        if (g.asiste === true || g.status === 'confirmada') esperados++;
+        if (g.status === 'declinada' || g.asiste === false) return;   // no viene
+        esperadas += (g.pases_confirmados || g.pases_asignados || 0);
+        if (g.checkin_at) llegaron += (g.pases_llegaron || 0);
     });
     $('mLlegaron').textContent = llegaron;
-    $('mFaltan').textContent   = Math.max(0, esperados - llegaron);
-    $('mPersonas').textContent = personas;
-    $('subEvento').textContent = invitados.length + ' invitados en la lista · ' + esperados + ' confirmados';
+    $('mFaltan').textContent   = Math.max(0, esperadas - llegaron);
+    $('mPersonas').textContent = esperadas;
+
+    const inv = invitados.length;
+    $('subEvento').textContent = inv === 1
+        ? '1 invitación · ' + esperadas + (esperadas === 1 ? ' persona' : ' personas')
+        : inv + ' invitaciones · ' + esperadas + ' personas';
 }
 
 /* ── Búsqueda manual: en la puerta siempre hay quien no trae
@@ -481,6 +499,7 @@ async function iniciarEscaner() {
         );
 
         escaneando = true;
+        $('lector').classList.add('activo');
         $('btnEscanear').classList.add('oculto');
         $('btnDetener').classList.remove('oculto');
     } catch (e) {
@@ -507,6 +526,7 @@ async function detenerEscaner() {
     if (!escaneando || !lector) return;
     try { await lector.stop(); lector.clear(); } catch (e) {}
     escaneando = false;
+    $('lector').classList.remove('activo');
     $('btnEscanear').classList.remove('oculto');
     $('btnDetener').classList.add('oculto');
 }
