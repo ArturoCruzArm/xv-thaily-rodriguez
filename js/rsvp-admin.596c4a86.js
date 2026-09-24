@@ -174,14 +174,35 @@
     }
 
     // ── Stats ────────────────────────────────────────────────────────────────
+    /* Personas que representa un registro. Una invitación puede ser
+       para una persona o para una familia entera; el titular cuenta
+       dentro de sus pases. Quien declinó no ocupa lugar. */
+    function personasDe(g) {
+        if (g.status === 'declinada' || g.asiste === false) return 0;
+        return g.pases_confirmados || g.pases_asignados || 0;
+    }
+
+    function sumaPersonas(lista) {
+        return lista.reduce((s, g) => s + personasDe(g), 0);
+    }
+
     function calcStats() {
+        const confirmados = guests.filter(g => g.status === 'confirmada');
+        const declinados  = guests.filter(g => g.status === 'declinada');
+        const pendientes  = guests.filter(g => ['pendiente','enviada','vista'].includes(g.status));
+        const llegaron    = guests.filter(g => g.checkin_at);
         return {
             total: guests.length,
-            confirmados: guests.filter(g => g.status === 'confirmada').length,
-            declinados: guests.filter(g => g.status === 'declinada').length,
-            pendientes: guests.filter(g => ['pendiente','enviada','vista'].includes(g.status)).length,
+            confirmados: confirmados.length,
+            declinados: declinados.length,
+            pendientes: pendientes.length,
             totalPases: guests.reduce((s, g) => s + (g.pases_asignados || 0), 0),
-            totalAsisten: guests.reduce((s, g) => s + (g.pases_confirmados || 0), 0),
+            totalAsisten: sumaPersonas(guests),
+            persConfirmados: sumaPersonas(confirmados),
+            persPendientes: sumaPersonas(pendientes),
+            persDeclinados: declinados.reduce((s, g) => s + (g.pases_asignados || 0), 0),
+            llegaron: llegaron.length,
+            persLlegaron: llegaron.reduce((s, g) => s + (g.pases_llegaron || 0), 0),
             catFamilia: guests.filter(g => g.categoria === 'familia').length,
             catPadrinos: guests.filter(g => g.categoria === 'padrinos').length,
             catAmigos: guests.filter(g => g.categoria === 'amigos').length,
@@ -193,15 +214,15 @@
 
     function renderStats() {
         const s = calcStats(), set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        set('totalInvitados', s.total); set('confirmados', s.confirmados);
-        set('pendientes', s.pendientes); set('noAsistiran', s.declinados);
-        set('totalAsistentes', s.totalAsisten); set('totalPases', s.totalPases + ' pases');
+        const pers = n => n + (n === 1 ? ' persona' : ' personas');
+        const invs = n => n + (n === 1 ? ' invitación' : ' invitaciones');
 
-        // Llegadas registradas en el acceso
-        const llegaron = guests.filter(g => g.checkin_at).length;
-        const personas = guests.reduce((n, g) => n + (g.checkin_at ? (g.pases_llegaron || 0) : 0), 0);
-        set('yaLlegaron', llegaron);
-        set('personasLlegaron', personas + (personas === 1 ? ' persona' : ' personas'));
+        set('totalInvitados', s.total);        set('totalPases', pers(s.totalPases));
+        set('totalAsistentes', s.totalAsisten); set('detalleAsistentes', 'de ' + invs(s.total));
+        set('confirmados', s.confirmados);     set('personasConfirmadas', pers(s.persConfirmados));
+        set('pendientes', s.pendientes);       set('personasPendientes', pers(s.persPendientes));
+        set('noAsistiran', s.declinados);      set('personasDeclinadas', pers(s.persDeclinados));
+        set('yaLlegaron', s.llegaron);         set('personasLlegaron', pers(s.persLlegaron));
     }
 
     /* ── Plano del salón ──────────────────────────────────────────────────────
