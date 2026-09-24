@@ -137,10 +137,32 @@
     #pasesLlegaron { font-size:2.4rem; font-weight:900; min-width:60px; }
     .pases-et { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--suave); }
 
+    /* El aviso del pase repetido: lo primero que se ve al abrir la
+       ficha, y cambia de color según qué tan grave es. */
     .aviso-ya {
+        border-radius:12px; padding:14px 16px; font-size:.85rem;
+        margin-bottom:14px; line-height:1.5;
         background:rgba(46,158,91,.14); border:1px solid var(--ok); color:#9fe0b8;
-        border-radius:10px; padding:12px; font-size:.85rem; margin-bottom:12px;
     }
+    .aviso-ya .tit {
+        display:block; font-size:1rem; font-weight:900; margin-bottom:5px;
+        letter-spacing:.02em;
+    }
+    .aviso-ya .veces {
+        display:inline-block; margin-top:8px; font-size:.7rem; font-weight:700;
+        letter-spacing:.1em; text-transform:uppercase; opacity:.8;
+    }
+    /* Faltaba gente y ahora llegó: hay que sumar, nada más. */
+    .aviso-ya.parcial {
+        background:rgba(217,148,39,.18); border-color:var(--aviso); color:#f4cf95;
+    }
+    .aviso-ya.parcial .tit { color:#f0c076; }
+    /* El pase ya estaba completo: aquí sí hay que detenerse. */
+    .aviso-ya.completo {
+        background:rgba(192,57,43,.2); border-color:var(--error); color:#f3b5ad;
+        box-shadow:0 0 0 3px rgba(192,57,43,.16);
+    }
+    .aviso-ya.completo .tit { color:#ff9c8e; font-size:1.08rem; }
     .aviso-declino {
         background:rgba(192,57,43,.14); border:1px solid var(--error); color:#f0a79f;
         border-radius:10px; padding:12px; font-size:.85rem; margin-bottom:12px;
@@ -263,6 +285,8 @@
 
     <!-- ── Ficha del invitado ── -->
     <div class="ficha" id="ficha">
+        <div id="avisoYa" class="aviso-ya oculto"></div>
+
         <div class="ficha-caja" id="fichaCaja">
             <div class="ficha-nombre" id="fNombre">—</div>
             <div class="ficha-estado" id="fEstado"></div>
@@ -281,9 +305,9 @@
         </div>
 
         <div id="avisoExtra" class="aviso-extra oculto"></div>
-        <div id="avisoYa" class="aviso-ya oculto"></div>
         <div id="avisoDeclino" class="aviso-declino oculto"></div>
 
+        <button class="btn verde oculto" id="btnCompletarPase">✓ Llegó el resto</button>
         <button class="btn verde" id="btnRegistrar">✓ Registrar llegada</button>
         <button class="btn chico" id="btnSepararGrupo">Registrar aparte a los de más</button>
         <button class="btn chico" id="btnVolver">← Volver</button>
@@ -469,7 +493,7 @@ $('buscar').addEventListener('input', function () {
 });
 
 /* ── Ficha ────────────────────────────────────────────────── */
-function abrirFicha(id) {
+function abrirFicha(id, origen) {
     const g = invitados.filter(function (x) { return x.id === id; })[0];
     if (!g) return;
     actual = g;
@@ -496,21 +520,7 @@ function abrirFicha(id) {
         ? 'personas de esta invitación que ya entraron (total)'
         : 'personas llegando';
 
-    const ya = $('avisoYa');
-    if (g.checkin_at) {
-        const hora = new Date(g.checkin_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-        const entraron = g.pases_llegaron || 0;
-        const faltan = Math.max(0, traia - entraron);
-        ya.innerHTML = '✓ Ya se registró a las ' + hora + ' con ' + entraron +
-                       ' de ' + traia + '.' +
-                       (faltan ? ' Si llegó el resto, sube el número hasta el total que ya entró.'
-                               : ' Si llegó gente de más, súbele el número o regístralos aparte.');
-        ya.classList.remove('oculto');
-        $('btnRegistrar').textContent = '✓ Actualizar llegada';
-    } else {
-        ya.classList.add('oculto');
-        $('btnRegistrar').textContent = '✓ Registrar llegada';
-    }
+    avisarPaseRepetido(g, traia, origen);
 
     const dec = $('avisoDeclino');
     if (g.status === 'declinada' || g.asiste === false) {
@@ -524,6 +534,88 @@ function abrirFicha(id) {
     $('ficha').classList.add('activa');
     window.scrollTo({ top: 0 });
 }
+
+/* ── Cuántas veces se ha escaneado cada pase en este aparato ──
+   Es el dato que delata un enlace compartido: el mismo código
+   pasando tres veces por la puerta. Vive en el teléfono que está
+   escaneando, que es donde importa. */
+const ESCANEOS_KEY = 'foro7_escaneos_' + SLUG;
+
+function leerEscaneos() {
+    try { return JSON.parse(localStorage.getItem(ESCANEOS_KEY)) || {}; }
+    catch (e) { return {}; }
+}
+
+function contarEscaneo(token) {
+    const m = leerEscaneos();
+    m[token] = (m[token] || 0) + 1;
+    try { localStorage.setItem(ESCANEOS_KEY, JSON.stringify(m)); } catch (e) {}
+    return m[token];
+}
+
+/* ── El aviso del pase repetido ───────────────────────────────
+   Dos situaciones muy distintas que no se pueden ver igual:
+
+     · Faltaba gente de esa invitación → llegó el resto. Normal.
+     · El pase ya estaba completo → o lo compartieron, o son
+       personas de más. Hay que detenerse.  */
+function avisarPaseRepetido(g, traia, origen) {
+    const ya  = $('avisoYa');
+    const btnResto = $('btnCompletarPase');
+
+    if (!g.checkin_at) {
+        ya.classList.add('oculto');
+        ya.className = 'aviso-ya oculto';
+        btnResto.classList.add('oculto');
+        $('btnRegistrar').textContent = '✓ Registrar llegada';
+        return;
+    }
+
+    const hora = new Date(g.checkin_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    const entraron = g.pases_llegaron || 0;
+    const faltan   = Math.max(0, traia - entraron);
+    const veces    = (leerEscaneos()[g.token] || 0);
+
+    let clase, titulo, cuerpo;
+    if (faltan > 0) {
+        clase  = 'parcial';
+        titulo = '⚠️ Este pase ya pasó';
+        cuerpo = 'Entraron <strong>' + entraron + ' de ' + traia + '</strong> a las ' + hora + '. ' +
+                 'Faltaban ' + faltan + (faltan === 1 ? ' persona' : ' personas') + '.<br>' +
+                 'Si es el resto del grupo, dale a «Llegó el resto».';
+        btnResto.textContent = '✓ Llegó el resto (' + faltan + ' más)';
+        btnResto.classList.remove('oculto');
+    } else {
+        clase  = 'completo';
+        titulo = '⛔ Este pase ya está completo';
+        cuerpo = '<strong>' + entraron + ' de ' + traia + '</strong> ya entraron a las ' + hora + '. ' +
+                 'No falta nadie de esta invitación.<br>' +
+                 'Si hay más gente afuera, traen el enlace compartido: son personas de más.';
+        btnResto.classList.add('oculto');
+    }
+
+    ya.className = 'aviso-ya ' + clase;
+    ya.innerHTML = '<span class="tit">' + titulo + '</span>' + cuerpo +
+                   (veces > 1 ? '<span class="veces">Se ha escaneado ' + veces + ' veces</span>' : '');
+    ya.classList.remove('oculto');
+    $('btnRegistrar').textContent = '✓ Actualizar llegada';
+
+    /* Vibrar distinto según el caso: en la puerta se siente antes de
+       leerse. Corto-corto si solo faltaba gente, largo si el pase ya
+       estaba completo. */
+    if (origen === 'escaneo') {
+        vibrar(faltan > 0 ? [70, 70, 70] : [220, 90, 220, 90, 220]);
+    }
+}
+
+/* Llegó el resto del grupo: el contador se va al total de la
+   invitación, que es lo que se quiere el 99% de las veces. */
+$('btnCompletarPase').addEventListener('click', function () {
+    if (!actual) return;
+    $('pasesLlegaron').textContent = actual.pases_confirmados || actual.pases_asignados || 0;
+    revisarExcedente();
+    $('btnRegistrar').focus();
+});
 
 function cerrarFicha() {
     actual = null;
@@ -874,8 +966,12 @@ async function alLeer(texto) {
     if (!g) { toast('Ese invitado no está en la lista.', true); vibrar([60, 60, 60]); return; }
 
     detenerEscaner();
-    vibrar(40);
-    abrirFicha(g.id);
+    const veces = contarEscaneo(token);
+    if (!g.checkin_at) vibrar(40);      // el aviso vibra solo si ya había pasado
+    abrirFicha(g.id, 'escaneo');
+    if (g.checkin_at) {
+        toast(veces > 2 ? 'Ojo: este pase ya se escaneó ' + veces + ' veces' : 'Este pase ya había pasado', true);
+    }
 }
 
 async function iniciarEscaner() {
