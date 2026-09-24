@@ -104,8 +104,11 @@ def main():
     with open(SALIDA, 'r', encoding='utf-8') as fh:
         firma = hashlib.sha1(fh.read().encode('utf-8')).hexdigest()[:8]
     nuevo = os.path.join(AQUI, 'js', 'photos.%s.js' % firma)
+    # Ojo: el glob también casa con la salida recién escrita. Borrarla
+    # aquí deja sin archivo al rename de abajo.
+    intocables = {os.path.abspath(nuevo), os.path.abspath(SALIDA)}
     for viejo in glob.glob(os.path.join(AQUI, 'js', 'photos*.js')):
-        if os.path.abspath(viejo) != os.path.abspath(nuevo):
+        if os.path.abspath(viejo) not in intocables:
             os.remove(viejo)
     if not os.path.exists(nuevo):
         os.rename(SALIDA, nuevo)

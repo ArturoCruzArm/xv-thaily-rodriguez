@@ -26,6 +26,9 @@
     { seccion: 'protagonistas', key: 'nombre_madre', sel: '[data-campo="madre-nombre"]' },
     { seccion: 'protagonistas', key: 'nombre_padre', sel: '[data-campo="padre-nombre"]' },
     { seccion: 'protagonistas', key: 'mensaje_especial', sel: '[data-campo="mensaje-especial"]' },
+
+    { seccion: 'padrinos_honor', key: 'padrino', sel: '[data-campo="padrino-nombre"]' },
+    { seccion: 'padrinos_honor', key: 'madrina', sel: '[data-campo="madrina-nombre"]' },
     // Vestimenta
     { seccion: 'vestimenta', key: 'tipo',              sel: '[data-campo="vestimenta-tipo"]' },
     { seccion: 'vestimenta', key: 'colores_reservados', sel: '[data-campo="vestimenta-colores"]' },
