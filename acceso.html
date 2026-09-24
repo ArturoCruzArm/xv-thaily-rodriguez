@@ -163,6 +163,67 @@
     }
     .caja-error strong { display:block; color:#f5b0a8; margin-bottom:4px; font-size:.95rem; }
     .caja-error span { color:var(--suave); }
+    /* ── Atajos de la vista principal ── */
+    .atajos { display:flex; gap:8px; margin-top:14px; }
+    .atajos .btn { margin:0; padding:14px 10px; font-size:.78rem; }
+
+    /* ── Alta en la puerta ── */
+    .campo { margin-bottom:14px; }
+    .campo label {
+        display:block; font-size:.66rem; letter-spacing:.14em;
+        text-transform:uppercase; color:var(--suave); margin-bottom:6px;
+    }
+    .campo input {
+        width:100%; padding:15px 14px; border-radius:12px;
+        border:1px solid var(--linea); background:var(--panel);
+        color:var(--texto); font-family:inherit; font-size:1rem;
+    }
+    .campo input:focus { outline:none; border-color:var(--acento); }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .chip {
+        background:var(--panel-2); border:1px solid var(--linea); color:var(--texto);
+        border-radius:999px; padding:8px 13px; font-family:inherit;
+        font-size:.78rem; font-weight:700; cursor:pointer;
+    }
+    .chip .libre { color:var(--ok); font-weight:900; }
+    .chip.nueva { border-style:dashed; color:var(--suave); }
+    .chip:active { background:var(--linea); }
+
+    /* ── Mesas ── */
+    .cap-fila {
+        display:flex; align-items:center; gap:10px; justify-content:center;
+        margin-bottom:14px; color:var(--suave); font-size:.78rem;
+    }
+    .cap-fila input {
+        width:62px; padding:8px; text-align:center; border-radius:8px;
+        border:1px solid var(--linea); background:var(--panel);
+        color:var(--texto); font-family:inherit; font-size:1rem; font-weight:900;
+    }
+    .mesa-item {
+        background:var(--panel); border:1px solid var(--linea);
+        border-radius:12px; padding:13px 15px; margin-bottom:9px;
+    }
+    .mesa-item.libre  { border-color:var(--ok); }
+    .mesa-item.llena  { opacity:.55; }
+    .mesa-cab { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+    .mesa-nom { font-size:1.05rem; font-weight:900; }
+    .mesa-hueco { font-size:.8rem; font-weight:900; color:var(--ok); }
+    .mesa-hueco.cero { color:var(--suave); }
+    .sillas { display:flex; flex-wrap:wrap; gap:4px; margin:9px 0 7px; }
+    .silla { width:13px; height:13px; border-radius:50%; background:var(--linea); }
+    .silla.ocupada  { background:var(--ok); }
+    .silla.apartada { background:var(--aviso); }
+    .silla.extra    { background:var(--error); }
+    .mesa-meta { font-size:.73rem; color:var(--suave); line-height:1.5; }
+    .leyenda { font-size:.7rem; color:var(--suave); text-align:center; margin:2px 0 16px; line-height:1.7; }
+    .leyenda i { display:inline-block; width:9px; height:9px; border-radius:50%; vertical-align:middle; }
+
+    .aviso-extra {
+        background:rgba(217,148,39,.16); border:1px solid var(--aviso);
+        border-radius:12px; padding:13px 15px; margin-bottom:12px; font-size:.85rem;
+    }
+    .aviso-extra strong { display:block; color:#f0c076; margin-bottom:3px; }
+
     .oculto { display:none !important; }
 </style>
 </head>
@@ -191,6 +252,13 @@
             <input type="search" id="buscar" placeholder="…o busca por nombre" autocomplete="off">
         </div>
         <div class="resultados" id="resultados"></div>
+
+        <!-- En la puerta llega gente que no está en ninguna lista, y hay
+             que saber dónde queda lugar para sentarla. -->
+        <div class="atajos">
+            <button class="btn chico" id="btnAlta">➕ No está en la lista</button>
+            <button class="btn chico" id="btnMesas">🪑 Ver mesas</button>
+        </div>
     </div>
 
     <!-- ── Ficha del invitado ── -->
@@ -212,11 +280,72 @@
             <div class="pases-et" id="pasesEtiqueta">personas llegando</div>
         </div>
 
+        <div id="avisoExtra" class="aviso-extra oculto"></div>
         <div id="avisoYa" class="aviso-ya oculto"></div>
         <div id="avisoDeclino" class="aviso-declino oculto"></div>
 
         <button class="btn verde" id="btnRegistrar">✓ Registrar llegada</button>
+        <button class="btn chico" id="btnSepararGrupo">Registrar aparte a los de más</button>
         <button class="btn chico" id="btnVolver">← Volver</button>
+    </div>
+
+    <!-- ── Alta en la puerta ──────────────────────────────────
+         Para el invitado de palabra, el de la invitación genérica
+         que nunca se registró, o el grupo de más que conviene
+         anotar por separado. -->
+    <div class="ficha" id="alta">
+        <h2 style="font-size:1rem;font-weight:900;margin-bottom:4px;">Registrar en la puerta</h2>
+        <p class="sub" style="margin-bottom:16px;">Queda anotado como que ya entró</p>
+
+        <div class="campo">
+            <label for="aNombre">Nombre</label>
+            <input type="text" id="aNombre" placeholder="Quién llega" autocomplete="off">
+        </div>
+
+        <div class="campo">
+            <label>Cuántas personas</label>
+            <div class="pases-fila">
+                <button type="button" id="aMenos" aria-label="Menos personas">−</button>
+                <span id="aPersonas">1</span>
+                <button type="button" id="aMas" aria-label="Más personas">+</button>
+            </div>
+        </div>
+
+        <div class="campo">
+            <label for="aMesa">Mesa</label>
+            <input type="text" id="aMesa" placeholder="Número o nombre de la mesa" autocomplete="off">
+            <div class="chips" id="aMesasSugeridas"></div>
+        </div>
+
+        <div class="campo">
+            <label for="aNota">Nota (opcional)</label>
+            <input type="text" id="aNota" placeholder="Ej. invitado por la mamá" autocomplete="off">
+        </div>
+
+        <button class="btn verde" id="btnGuardarAlta">✓ Registrar y dejar pasar</button>
+        <button class="btn chico" id="btnCancelarAlta">← Volver</button>
+    </div>
+
+    <!-- ── Mesas ─────────────────────────────────────────────
+         Para saber dónde sentar a quien llegó sin lugar: qué mesas
+         están vacías y cuáles solo esperan a gente que no llega. -->
+    <div class="ficha" id="mesas">
+        <h2 style="font-size:1rem;font-weight:900;margin-bottom:4px;">Mesas</h2>
+        <p class="sub" style="margin-bottom:14px;" id="mesasResumen">—</p>
+
+        <div class="cap-fila">
+            <label for="capMesaPuerta">Lugares por mesa</label>
+            <input type="number" id="capMesaPuerta" min="2" max="20" value="10">
+        </div>
+
+        <p class="leyenda">
+            <i style="background:#2e9e5b"></i> ya llegó ·
+            <i style="background:#d99427"></i> apartado, no ha llegado ·
+            <i style="background:#3a3134"></i> libre
+        </p>
+
+        <div id="mesasLista"></div>
+        <button class="btn chico" id="btnCerrarMesas">← Volver</button>
     </div>
 
     <p class="pie">
@@ -296,10 +425,20 @@ function pintarMarcador() {
     $('mFaltan').textContent   = Math.max(0, esperadas - llegaron);
     $('mPersonas').textContent = esperadas;
 
+    /* Los que entraron de más, contados invitación por invitación: si
+       se suma todo y se resta, los que aún no llegan tapan a los que
+       llegaron de sobra y el dato nunca aparece. */
+    let demas = 0;
+    invitados.forEach(function (g) {
+        if (!g.checkin_at) return;
+        demas += Math.max(0, (g.pases_llegaron || 0) -
+                             (g.pases_confirmados || g.pases_asignados || 0));
+    });
     const inv = invitados.length;
-    $('subEvento').textContent = inv === 1
-        ? '1 invitación · ' + esperadas + (esperadas === 1 ? ' persona' : ' personas')
-        : inv + ' invitaciones · ' + esperadas + ' personas';
+    $('subEvento').textContent =
+        (inv === 1 ? '1 invitación · ' + esperadas + (esperadas === 1 ? ' persona' : ' personas')
+                   : inv + ' invitaciones · ' + esperadas + ' personas') +
+        (demas ? ' · ' + demas + ' de más' : '');
 }
 
 /* ── Búsqueda manual: en la puerta siempre hay quien no trae
@@ -347,11 +486,25 @@ function abrirFicha(id) {
 
     const sugeridos = g.pases_llegaron || g.pases_confirmados || g.pases_asignados || 1;
     $('pasesLlegaron').textContent = sugeridos;
+    revisarExcedente();
+
+    /* El contador es SIEMPRE el total de personas que ya entraron de
+       esta invitación, no las que acaban de llegar: si vienen en dos
+       tandas, la segunda vez se sube hasta el total. */
+    const traia = g.pases_confirmados || g.pases_asignados || 0;
+    $('pasesEtiqueta').textContent = g.checkin_at
+        ? 'personas de esta invitación que ya entraron (total)'
+        : 'personas llegando';
 
     const ya = $('avisoYa');
     if (g.checkin_at) {
-        ya.textContent = '✓ Ya se registró a las ' + new Date(g.checkin_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) +
-                         ' con ' + (g.pases_llegaron || 0) + '. Puedes corregir el número y volver a guardar.';
+        const hora = new Date(g.checkin_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        const entraron = g.pases_llegaron || 0;
+        const faltan = Math.max(0, traia - entraron);
+        ya.innerHTML = '✓ Ya se registró a las ' + hora + ' con ' + entraron +
+                       ' de ' + traia + '.' +
+                       (faltan ? ' Si llegó el resto, sube el número hasta el total que ya entró.'
+                               : ' Si llegó gente de más, súbele el número o regístralos aparte.');
         ya.classList.remove('oculto');
         $('btnRegistrar').textContent = '✓ Actualizar llegada';
     } else {
@@ -382,11 +535,36 @@ function cerrarFicha() {
 
 $('btnVolver').addEventListener('click', cerrarFicha);
 
+/* Una invitación para 3 se comparte y llegan 6: hay que verlo en el
+   momento, no al final de la noche cuando ya no hay sillas. */
+function revisarExcedente() {
+    const caja = $('avisoExtra');
+    if (!caja) return;
+    if (!actual) { caja.classList.add('oculto'); $('btnSepararGrupo').classList.add('oculto'); return; }
+    const traia = actual.pases_confirmados || actual.pases_asignados || 0;
+    const ahora = parseInt($('pasesLlegaron').textContent, 10) || 0;
+    const extra = ahora - traia;
+    if (extra > 0) {
+        const mesa = (actual.mesa_asignada || '').trim();
+        caja.innerHTML = '<strong>Llegan ' + extra + (extra === 1 ? ' persona de más' : ' personas de más') + '</strong>' +
+                         'Su invitación era para ' + traia + '. Puedes dejarlos en este registro, ' +
+                         'o anotarlos aparte para darles su propia mesa' +
+                         (mesa ? ' (esta es la mesa ' + mesa + ').' : '.');
+        caja.classList.remove('oculto');
+        $('btnSepararGrupo').classList.remove('oculto');
+    } else {
+        caja.classList.add('oculto');
+        $('btnSepararGrupo').classList.add('oculto');
+    }
+}
+
 $('btnMas').addEventListener('click', function () {
     $('pasesLlegaron').textContent = Math.min(30, parseInt($('pasesLlegaron').textContent, 10) + 1);
+    revisarExcedente();
 });
 $('btnMenos').addEventListener('click', function () {
     $('pasesLlegaron').textContent = Math.max(0, parseInt($('pasesLlegaron').textContent, 10) - 1);
+    revisarExcedente();
 });
 
 /* ── Registrar la llegada ─────────────────────────────────── */
@@ -407,6 +585,7 @@ $('btnRegistrar').addEventListener('click', async function () {
         const i = invitados.findIndex(function (x) { return x.id === actual.id; });
         if (i !== -1) invitados[i] = Object.assign(invitados[i], act);
         pintarMarcador();
+        if ($('mesas').classList.contains('activa')) pintarMesas();
         vibrar(60);
         const mesa = (actual.mesa_asignada || '').trim();
         toast('✓ ' + actual.nombre.split(' ')[0] + (mesa ? ' → mesa ' + mesa : ' registrado'));
@@ -415,6 +594,261 @@ $('btnRegistrar').addEventListener('click', async function () {
         toast('No se pudo guardar. Revisa la señal.', true);
     }
     btn.disabled = false;
+});
+
+/* ── Mesas ────────────────────────────────────────────────────
+   Cuánta gente cabe, cuánta apartó lugar y cuánta ya llegó. Sirve
+   para dos cosas: sentar a quien llegó sin lugar, y ver de un
+   vistazo qué mesas siguen vacías porque su gente no llega.
+
+   La capacidad se comparte con el plano del salón de invitados.html:
+   es la misma clave y el mismo navegador. */
+const CAP_KEY = 'foro7_cap_mesa_' + SLUG;
+const ALIAS_PRINCIPAL = ['principal', 'novios', 'honor', 'festejados', 'festejado',
+                         'quinceanera', 'quinceañera'];
+
+function capacidadMesa() {
+    const n = parseInt(localStorage.getItem(CAP_KEY), 10);
+    return (!isNaN(n) && n >= 2 && n <= 20) ? n : 10;
+}
+
+function claveMesa(m) {
+    const t = (m || '').trim();
+    if (!t) return null;
+    return ALIAS_PRINCIPAL.indexOf(normalizar(t)) !== -1 ? '__principal__' : t;
+}
+
+/* Una fila por mesa con sus cuentas ya hechas. */
+function resumenMesas() {
+    const mapa = {};
+    invitados.forEach(function (g) {
+        if (g.status === 'declinada' || g.asiste === false) return;
+        const k = claveMesa(g.mesa_asignada);
+        if (!k) return;                                  // sin mesa: no ocupa ninguna
+        const m = mapa[k] = mapa[k] || { clave: k, apartados: 0, llegaron: 0, personas: [] };
+        m.apartados += (g.pases_confirmados || g.pases_asignados || 0);
+        if (g.checkin_at) m.llegaron += (g.pases_llegaron || 0);
+        m.personas.push(g);
+    });
+
+    const cap = capacidadMesa();
+    const filas = Object.keys(mapa).map(function (k) {
+        const m = mapa[k];
+        m.capacidad = cap;
+        m.porLlegar = Math.max(0, m.apartados - m.llegaron);
+        m.libres    = Math.max(0, cap - Math.max(m.apartados, m.llegaron));
+        m.vacios    = Math.max(0, cap - m.llegaron);     // lo que está físicamente vacío
+        m.sobrecupo = Math.max(0, Math.max(m.apartados, m.llegaron) - cap);
+        m.nombre    = k === '__principal__' ? 'Mesa principal' : 'Mesa ' + k;
+        return m;
+    });
+
+    // Primero donde cabe más gente sin quitarle el lugar a nadie
+    filas.sort(function (a, b) {
+        if (b.libres !== a.libres) return b.libres - a.libres;
+        if (b.vacios !== a.vacios) return b.vacios - a.vacios;
+        const na = parseInt(a.clave, 10), nb = parseInt(b.clave, 10);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return String(a.clave).localeCompare(String(b.clave), 'es');
+    });
+    return filas;
+}
+
+/* El siguiente número de mesa que nadie está usando. */
+function siguienteMesaLibre() {
+    const usados = {};
+    invitados.forEach(function (g) {
+        const n = parseInt((g.mesa_asignada || '').trim(), 10);
+        if (!isNaN(n)) usados[n] = true;
+    });
+    let n = 1;
+    while (usados[n]) n++;
+    return String(n);
+}
+
+function pintarMesas() {
+    const cont = $('mesasLista');
+    const filas = resumenMesas();
+    $('capMesaPuerta').value = capacidadMesa();
+
+    if (!filas.length) {
+        cont.innerHTML = '<p style="color:var(--suave);text-align:center;padding:20px 0;">' +
+                         'Todavía no hay mesas asignadas. En cuanto le pongas mesa a alguien, ' +
+                         'aparece aquí.</p>';
+        $('mesasResumen').textContent = '';
+        return;
+    }
+
+    const conLugar = filas.filter(function (m) { return m.libres > 0; });
+    const huecos   = filas.reduce(function (s, m) { return s + m.libres; }, 0);
+    $('mesasResumen').textContent = filas.length + (filas.length === 1 ? ' mesa · ' : ' mesas · ') +
+        (huecos ? huecos + (huecos === 1 ? ' lugar libre en ' : ' lugares libres en ') +
+                  conLugar.length + (conLugar.length === 1 ? ' mesa' : ' mesas')
+                : 'todas apartadas');
+
+    cont.innerHTML = filas.map(function (m) {
+        let sillas = '';
+        for (let i = 0; i < m.capacidad; i++) {
+            const cls = i < m.llegaron ? 'ocupada'
+                      : i < Math.max(m.apartados, m.llegaron) ? 'apartada' : '';
+            sillas += '<span class="silla ' + cls + '"></span>';
+        }
+        for (let i = 0; i < m.sobrecupo; i++) sillas += '<span class="silla extra"></span>';
+
+        const partes = [];
+        partes.push(m.llegaron + (m.llegaron === 1 ? ' persona ya llegó' : ' personas ya llegaron'));
+        if (m.porLlegar) partes.push(m.porLlegar + ' sin llegar');
+        if (m.sobrecupo) partes.push('<strong style="color:var(--error)">' + m.sobrecupo + ' de sobrecupo</strong>');
+
+        const nota = m.libres === 0 && m.porLlegar
+            ? 'Solo se desocupa si esa gente ya no viene.'
+            : (m.vacios && !m.libres ? 'Hay ' + m.vacios + ' lugares vacíos, pero están apartados.' : '');
+
+        return '<div class="mesa-item ' + (m.libres ? 'libre' : (m.vacios ? '' : 'llena')) + '" data-mesa="' +
+               (m.clave === '__principal__' ? 'Principal' : m.clave) + '">' +
+               '<div class="mesa-cab"><span class="mesa-nom">' + m.nombre + '</span>' +
+               '<span class="mesa-hueco' + (m.libres ? '' : ' cero') + '">' +
+               (m.libres ? m.libres + (m.libres === 1 ? ' lugar libre' : ' lugares libres') : 'sin lugar') +
+               '</span></div>' +
+               '<div class="sillas">' + sillas + '</div>' +
+               '<div class="mesa-meta">' + partes.join(' · ') +
+               (nota ? '<br>' + nota : '') + '</div></div>';
+    }).join('');
+
+    // Tocar una mesa abre el alta ya con esa mesa puesta
+    Array.prototype.forEach.call(cont.querySelectorAll('.mesa-item'), function (el) {
+        el.addEventListener('click', function () { abrirAlta({ mesa: el.dataset.mesa }); });
+    });
+}
+
+$('btnMesas').addEventListener('click', function () {
+    pintarMesas();
+    $('vistaPrincipal').classList.add('oculto');
+    $('mesas').classList.add('activa');
+    window.scrollTo({ top: 0 });
+});
+
+$('btnCerrarMesas').addEventListener('click', function () {
+    $('mesas').classList.remove('activa');
+    $('vistaPrincipal').classList.remove('oculto');
+});
+
+$('capMesaPuerta').addEventListener('change', function () {
+    const n = parseInt(this.value, 10);
+    if (!isNaN(n) && n >= 2 && n <= 20) { localStorage.setItem(CAP_KEY, n); pintarMesas(); }
+    else this.value = capacidadMesa();
+});
+
+/* ── Alta en la puerta ────────────────────────────────────────
+   El invitado de palabra, el de la invitación genérica que nunca
+   se registró, el grupo de más que llegó con un enlace prestado.
+   Se registra y entra en el mismo movimiento. */
+function abrirAlta(pre) {
+    pre = pre || {};
+    $('aNombre').value = pre.nombre || '';
+    $('aPersonas').textContent = pre.personas || 1;
+    $('aMesa').value = pre.mesa || '';
+    $('aNota').value = pre.nota || '';
+
+    // Sugerir las mesas donde de verdad cabe gente
+    const libres = resumenMesas().filter(function (m) { return m.libres > 0; }).slice(0, 6);
+    $('aMesasSugeridas').innerHTML =
+        libres.map(function (m) {
+            return '<button type="button" class="chip" data-mesa="' +
+                   (m.clave === '__principal__' ? 'Principal' : m.clave) + '">' +
+                   m.nombre.replace('Mesa ', '') + ' <span class="libre">' + m.libres + '</span></button>';
+        }).join('') +
+        '<button type="button" class="chip nueva" data-mesa="' + siguienteMesaLibre() + '">' +
+        '+ mesa ' + siguienteMesaLibre() + '</button>';
+
+    Array.prototype.forEach.call($('aMesasSugeridas').querySelectorAll('.chip'), function (b) {
+        b.addEventListener('click', function () { $('aMesa').value = b.dataset.mesa; });
+    });
+
+    $('vistaPrincipal').classList.add('oculto');
+    $('ficha').classList.remove('activa');
+    $('mesas').classList.remove('activa');
+    $('alta').classList.add('activa');
+    window.scrollTo({ top: 0 });
+    if (!pre.nombre) $('aNombre').focus();
+}
+
+function cerrarAlta() {
+    $('alta').classList.remove('activa');
+    $('vistaPrincipal').classList.remove('oculto');
+}
+
+$('btnAlta').addEventListener('click', function () {
+    // Si venía escribiendo un nombre en el buscador, se aprovecha
+    abrirAlta({ nombre: $('buscar').value.trim() });
+});
+$('btnCancelarAlta').addEventListener('click', cerrarAlta);
+
+$('aMas').addEventListener('click', function () {
+    $('aPersonas').textContent = Math.min(20, parseInt($('aPersonas').textContent, 10) + 1);
+});
+$('aMenos').addEventListener('click', function () {
+    $('aPersonas').textContent = Math.max(1, parseInt($('aPersonas').textContent, 10) - 1);
+});
+
+$('btnGuardarAlta').addEventListener('click', async function () {
+    const btn = this;
+    const nombre = $('aNombre').value.trim();
+    if (!nombre) { toast('Falta el nombre.', true); $('aNombre').focus(); return; }
+    if (!eventoId) { toast('Todavía no cargó el evento.', true); return; }
+
+    const n = parseInt($('aPersonas').textContent, 10) || 1;
+    const mesa = $('aMesa').value.trim();
+    const nota = $('aNota').value.trim();
+
+    btn.disabled = true;
+    btn.textContent = 'Guardando…';
+    try {
+        const r = await fetch(SB_URL + '/rest/v1/invitados', {
+            method: 'POST',
+            headers: Object.assign({}, SB_H, { Prefer: 'return=representation' }),
+            body: JSON.stringify({
+                evento_id: eventoId,
+                nombre: nombre,
+                categoria: 'otro',
+                pases_asignados: n,
+                pases_confirmados: n,
+                mesa_asignada: mesa || null,
+                status: 'confirmada',
+                asiste: true,
+                checkin_at: new Date().toISOString(),
+                pases_llegaron: n,
+                checkin_nota: nota || 'Registrado en la puerta'
+            })
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const [nuevo] = await r.json();
+        invitados.push(nuevo);
+        pintarMarcador();
+        vibrar(60);
+        toast('✓ ' + nombre.split(' ')[0] + (mesa ? ' → mesa ' + mesa : ' registrado'));
+        cerrarAlta();
+        $('buscar').value = '';
+        $('resultados').innerHTML = '';
+    } catch (e) {
+        toast('No se pudo registrar. Revisa la señal.', true);
+    }
+    btn.disabled = false;
+    btn.textContent = '✓ Registrar y dejar pasar';
+});
+
+/* Los de más van como registro aparte, para no ensuciar la
+   invitación original y para que queden con su propia mesa. */
+$('btnSepararGrupo').addEventListener('click', function () {
+    if (!actual) return;
+    const traia = actual.pases_confirmados || actual.pases_asignados || 0;
+    const ahora = parseInt($('pasesLlegaron').textContent, 10) || 0;
+    const extra = Math.max(1, ahora - traia);
+    abrirAlta({
+        personas: extra,
+        mesa: '',
+        nota: 'Llegaron con el enlace de ' + actual.nombre
+    });
 });
 
 /* ── Escáner de códigos ───────────────────────────────────── */
