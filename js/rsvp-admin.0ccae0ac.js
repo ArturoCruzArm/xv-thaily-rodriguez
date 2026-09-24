@@ -214,15 +214,17 @@
 
     function renderStats() {
         const s = calcStats(), set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        const pers = n => n + (n === 1 ? ' persona' : ' personas');
-        const invs = n => n + (n === 1 ? ' invitación' : ' invitaciones');
+        const invs = n => n === 1 ? 'en 1 invitación' : 'en ' + n + ' invitaciones';
 
-        set('totalInvitados', s.total);        set('totalPases', pers(s.totalPases));
-        set('totalAsistentes', s.totalAsisten); set('detalleAsistentes', 'de ' + invs(s.total));
-        set('confirmados', s.confirmados);     set('personasConfirmadas', pers(s.persConfirmados));
-        set('pendientes', s.pendientes);       set('personasPendientes', pers(s.persPendientes));
-        set('noAsistiran', s.declinados);      set('personasDeclinadas', pers(s.persDeclinados));
-        set('yaLlegaron', s.llegaron);         set('personasLlegaron', pers(s.persLlegaron));
+        /* Todo se cuenta en PERSONAS: una invitación de 10 pases es
+           una invitación para 10 personas. El número de invitaciones
+           va abajo, como referencia de cuántos mensajes se mandan. */
+        set('totalInvitados', s.totalPases);      set('totalPases', invs(s.total));
+        set('totalAsistentes', s.totalAsisten);   set('detalleAsistentes', 'quedan por venir');
+        set('confirmados', s.persConfirmados);    set('personasConfirmadas', invs(s.confirmados));
+        set('pendientes', s.persPendientes);      set('personasPendientes', invs(s.pendientes));
+        set('noAsistiran', s.persDeclinados);     set('personasDeclinadas', invs(s.declinados));
+        set('yaLlegaron', s.persLlegaron);        set('personasLlegaron', invs(s.llegaron));
     }
 
     /* ── Plano del salón ──────────────────────────────────────────────────────
