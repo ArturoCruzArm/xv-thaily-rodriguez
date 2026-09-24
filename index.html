@@ -372,67 +372,7 @@
         .splash-btn:hover { background: var(--dorado-claro); color: var(--vino-hondo); transform: translateY(-3px); }
         .splash-hint { font-size: .72rem; opacity: .45; margin-top: 1rem; }
 
-        /* ── Agregar al calendario ───────────────────────────────────
-   Genera un .ics en el navegador: sirve en iPhone, Android y
-   computadora sin depender de ninguna cuenta. ── */
-(function () {
-    const btn = document.getElementById('btnCalendario');
-    if (!btn) return;
-    function dd(n) { return String(n).padStart(2, '0'); }
-    function aUTC(d) {
-        return d.getUTCFullYear() + dd(d.getUTCMonth() + 1) + dd(d.getUTCDate()) +
-               'T' + dd(d.getUTCHours()) + dd(d.getUTCMinutes()) + '00Z';
-    }
-    btn.addEventListener('click', function () {
-        const inicio = new Date('2026-10-31T19:00:00-06:00');
-        const fin    = new Date('2026-11-01T01:00:00-06:00');
-        const lugar  = (document.querySelector('[data-campo="recepcion-lugar"]') || {}).textContent || '';
-        const ics = [
-            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FORO 7//Invitacion//ES',
-            'BEGIN:VEVENT',
-            'UID:xv-thaily-rodriguez@invitados.org',
-            'DTSTAMP:' + aUTC(new Date()),
-            'DTSTART:' + aUTC(inicio),
-            'DTEND:' + aUTC(fin),
-            'SUMMARY:XV Anos de Thaily Rodriguez',
-            'DESCRIPTION:XV anos de Thaily. Consulta la invitacion para el lugar y la hora.',
-            'LOCATION:' + lugar,
-            'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY',
-            'DESCRIPTION:Manana es el evento',
-            'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'
-        ].join('\r\n');
-        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'XV-Thaily-31-octubre.ics';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-    });
-})();
-
-/* ── Compartir la invitación ─────────────────────────────── */
-(function () {
-    const btn = document.getElementById('btnCompartir');
-    if (!btn) return;
-    const url   = location.origin + location.pathname;
-    const texto = 'Estás invitado(a) a los XV años de Thaily · Sábado 31 de octubre de 2026';
-    btn.addEventListener('click', async function () {
-        if (navigator.share) {
-            try { await navigator.share({ title: 'XV Años de Thaily', text: texto, url: url }); return; }
-            catch (e) { if (e && e.name === 'AbortError') return; }
-        }
-        try {
-            await navigator.clipboard.writeText(texto + ' ' + url);
-            const antes = btn.textContent;
-            btn.textContent = '✓ Enlace copiado';
-            setTimeout(function () { btn.textContent = antes; }, 2200);
-        } catch (e) {
-            window.open('https://wa.me/?text=' + encodeURIComponent(texto + ' ' + url), '_blank');
-        }
-    });
-})();
-
-/* ── Aparición progresiva ───────────────────────────── */
+        /* ── Aparición progresiva ───────────────────────────── */
         .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
         .reveal.visible { opacity: 1; transform: none; }
         @media (prefers-reduced-motion: reduce) {
@@ -761,6 +701,66 @@
         if (e.key === 'Escape')     cerrar();
         if (e.key === 'ArrowLeft')  abrir(i - 1);
         if (e.key === 'ArrowRight') abrir(i + 1);
+    });
+})();
+
+/* ── Agregar al calendario ───────────────────────────────────
+   Genera un .ics en el navegador: sirve en iPhone, Android y
+   computadora sin depender de ninguna cuenta. ── */
+(function () {
+    const btn = document.getElementById('btnCalendario');
+    if (!btn) return;
+    function dd(n) { return String(n).padStart(2, '0'); }
+    function aUTC(d) {
+        return d.getUTCFullYear() + dd(d.getUTCMonth() + 1) + dd(d.getUTCDate()) +
+               'T' + dd(d.getUTCHours()) + dd(d.getUTCMinutes()) + '00Z';
+    }
+    btn.addEventListener('click', function () {
+        const inicio = new Date('2026-10-31T19:00:00-06:00');
+        const fin    = new Date('2026-11-01T01:00:00-06:00');
+        const lugar  = (document.querySelector('[data-campo="recepcion-lugar"]') || {}).textContent || '';
+        const ics = [
+            'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FORO 7//Invitacion//ES',
+            'BEGIN:VEVENT',
+            'UID:xv-thaily-rodriguez@invitados.org',
+            'DTSTAMP:' + aUTC(new Date()),
+            'DTSTART:' + aUTC(inicio),
+            'DTEND:' + aUTC(fin),
+            'SUMMARY:XV Anos de Thaily Rodriguez',
+            'DESCRIPTION:XV anos de Thaily. Consulta la invitacion para el lugar y la hora.',
+            'LOCATION:' + lugar,
+            'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY',
+            'DESCRIPTION:Manana es el evento',
+            'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'
+        ].join('\r\n');
+        const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'XV-Thaily-31-octubre.ics';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    });
+})();
+
+/* ── Compartir la invitación ─────────────────────────────── */
+(function () {
+    const btn = document.getElementById('btnCompartir');
+    if (!btn) return;
+    const url   = location.origin + location.pathname;
+    const texto = 'Estás invitado(a) a los XV años de Thaily · Sábado 31 de octubre de 2026';
+    btn.addEventListener('click', async function () {
+        if (navigator.share) {
+            try { await navigator.share({ title: 'XV Años de Thaily', text: texto, url: url }); return; }
+            catch (e) { if (e && e.name === 'AbortError') return; }
+        }
+        try {
+            await navigator.clipboard.writeText(texto + ' ' + url);
+            const antes = btn.textContent;
+            btn.textContent = '✓ Enlace copiado';
+            setTimeout(function () { btn.textContent = antes; }, 2200);
+        } catch (e) {
+            window.open('https://wa.me/?text=' + encodeURIComponent(texto + ' ' + url), '_blank');
+        }
     });
 })();
 
