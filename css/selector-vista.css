@@ -1,0 +1,18 @@
+.selector-menu > summary { cursor:pointer; padding:14px 20px; background:#6d1f33; color:white; font-weight:700; }
+.selector-menu[open] .menu-cerrado, .selector-menu:not([open]) .menu-abierto { display:none; }
+.selector-menu .control-panel { position:static; }
+.selector-menu:not([open]) { position:sticky; top:0; z-index:200; }
+#photoModal { padding:0; }
+#photoModal .modal-content { width:100%; max-width:none; height:100dvh; max-height:100dvh; border-radius:0; }
+#photoModal .modal-body { height:100%; }
+#photoModal .modal-image-container img { width:100%; height:100%; max-height:100dvh; object-fit:contain; }
+#photoModal .modal-image-container { min-width:0; }
+#photoModal.photo-expanded .modal-options { display:none; }
+#photoModal .photo-view-toggle { position:absolute; top:10px; left:12px; z-index:5; max-width:calc(100% - 80px); background:white; }
+#photoModal .modal-close { z-index:6; width:44px; height:44px; }
+#photoModal:not(.photo-expanded) .modal-options { padding-top:65px; }
+@media(max-width:900px) {
+ #photoModal:not(.photo-expanded) .modal-image-container { flex:1 1 55%; min-height:0; }
+ #photoModal:not(.photo-expanded) .modal-options { flex:0 1 45%; padding-top:12px; }
+ #photoModal.photo-expanded .modal-image-container { flex:1 1 100%; }
+}

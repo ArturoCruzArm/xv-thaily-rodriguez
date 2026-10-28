@@ -12,9 +12,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/base.css?v=1">
 <link rel="stylesheet" href="css/selector-fotos-20261023.css">
+<link rel="stylesheet" href="css/selector-vista.css?v=20261028">
 </head>
 <body>
 
+<details class="selector-menu" open>
+<summary>Menú del selector <span class="menu-abierto">· Minimizar</span><span class="menu-cerrado">· Mostrar</span></summary>
 <header class="header">
     <p class="script">Selector de Fotos</p>
     <h1 class="main-title" id="tituloEvento">Thaily Rodríguez</h1>
@@ -59,6 +62,7 @@
     </div>
 </section>
 
+</details>
 <main class="gallery-section">
     <div class="container">
         <div class="photos-grid" id="photosGrid"></div>
@@ -70,6 +74,7 @@
     <button class="modal-nav-btn modal-prev" id="btnPrev" aria-label="Foto anterior">&#10094;</button>
     <button class="modal-nav-btn modal-next" id="btnNext" aria-label="Foto siguiente">&#10095;</button>
     <div class="modal-content">
+        <button type="button" class="btn btn-suave photo-view-toggle" id="btnPhotoView" aria-expanded="false">Mostrar opciones de selección</button>
         <button class="modal-close" aria-label="Cerrar">&times;</button>
         <div class="modal-body">
             <div class="modal-image-container">
@@ -128,6 +133,7 @@
 <script src="js/photos.corregidas-20261023.js"></script>
 <script src="js/supabase-api.js?v=1"></script>
 <script src="js/selector.js?v=1"></script>
+<script src="js/selector-vista.js?v=20261028"></script>
 <script src="js/ayuda.js?v=1"></script>
 <script src="visitas.js?v=1"></script>
 <script src="js/foro7-footer.js?v=1"></script>
