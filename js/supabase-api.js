@@ -125,7 +125,7 @@ async function filaRemota(eid, idx) {
         `${URL_BASE}/rest/v1/selecciones?evento_id=eq.${eid}&foto_index=eq.${idx}&select=${SELECT_COLS}&limit=1`,
         { headers: HEADERS }
     );
-    if (!r.ok) return null;
+    if (!r.ok) throw new Error('lectura ' + r.status);
     const rows = await r.json();
     return rows[0] || null;
 }
@@ -137,6 +137,9 @@ async function escribir(row) {
         body:    JSON.stringify([row])
     });
     if (!r.ok) throw new Error('upsert ' + r.status);
+    const saved = await filaRemota(row.evento_id, row.foto_index);
+    if (saved?.datos?._sync?.clock !== row.datos._sync.clock || saved?.datos?._sync?.sid !== SESSION_ID)
+        throw new Error('La nube no confirmó el cambio; se reintentará');
 }
 
 function armarFila(eid, idx, sel, clock, borrada, filename) {
@@ -198,10 +201,6 @@ async function guardarFoto(idx, sel, filename) {
     const meta   = metaDe(remota);
     const local  = Number(leerRelojes()[String(idx)] || 0);
 
-    if (meta.clock > local && meta.sid !== SESSION_ID) {
-        recordarReloj(idx, meta.clock);
-        return 'desactualizado';
-    }
 
     const clock = siguienteReloj(idx, meta.clock);
     await escribir(armarFila(eid, idx, sel, clock, false, filename));
@@ -216,10 +215,6 @@ async function borrarFoto(idx) {
     const meta   = metaDe(remota);
     const local  = Number(leerRelojes()[String(idx)] || 0);
 
-    if (meta.clock > local && meta.sid !== SESSION_ID) {
-        recordarReloj(idx, meta.clock);
-        return 'desactualizado';
-    }
 
     const clock = siguienteReloj(idx, meta.clock);
     await escribir(armarFila(eid, idx, {}, clock, true));

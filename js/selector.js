@@ -27,6 +27,7 @@ let currentIndex     = null;
 let currentFilter    = 'all';
 let sbDisponible     = true;
 let modalOpen        = false;
+let modalBaseline = '';
 let touchStartX = 0, touchStartY = 0;
 let scrollSaveTimer  = null;
 
@@ -50,64 +51,40 @@ function nombresPorIndice() {
 
 /* Sincroniza UNA foto. La tabla exige reloj lógico por foto
    (ver js/supabase-api.js), por eso no hay envío en bloque. */
-function sincronizarFoto(index) {
-    if (!sbDisponible) return;
-    const sel = selections[index];
-    const p = (sel && !vacio(sel))
-        ? SB.guardarFoto(index, sel, files[index])
-        : SB.borrarFoto(index);
-
-    p.then(r => {
-        if (r === 'desactualizado') {
-            toast('Otro dispositivo iba más adelantado; actualizando…', 'error');
-            cargar(true);
-        }
-    }).catch(e => console.warn('[Supabase] foto ' + index + ':', e.message));
+let sync;
+function estadoGuardado(message) {
+    let el = document.getElementById('saveStatus');
+    if (!el) {
+        el = document.createElement('p'); el.id = 'saveStatus';
+        el.setAttribute('role', 'status');
+        el.style.cssText = 'padding:12px;text-align:center;background:#172033;color:white;position:sticky;top:0;z-index:90';
+        document.body.prepend(el);
+    }
+    el.textContent = message;
 }
-
+function sincronizarFoto(index) { sync.change(String(index), selections[index] || null); }
 async function cargar(esPolling) {
-    if (!esPolling) {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) selections = JSON.parse(raw);
-        } catch (e) { selections = {}; }
+    if (!sync) {
+        try { selections = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) {}
+        // Keep pre-fix local data recoverable without silently resurrecting old choices.
+        if (!localStorage.getItem(STORAGE_KEY + '_respaldo'))
+            localStorage.setItem(STORAGE_KEY + '_respaldo', JSON.stringify(selections));
         pintarTodo();
+        sync = createSelectionSync({key: STORAGE_KEY,
+            read: () => SB.fetchSelecciones(),
+            write: async batch => {
+                for (const [index, change] of Object.entries(batch)) {
+                    if (change.value) await SB.guardarFoto(Number(index), change.value, files[index]);
+                    else await SB.borrarFoto(Number(index));
+                }
+            },
+            apply: remote => { selections = remote; guardarLocal(); pintarTodo(); },
+            status: estadoGuardado
+        });
+        window.addEventListener('online', () => sync.refresh());
+        SB.registrarVisita('selector');
     }
-
-    if (!sbDisponible) return;
-    try {
-        const remotas = await SB.fetchSelecciones();
-
-        if (!esPolling) {
-            // Primera carga: lo local que no esté en la nube se sube.
-            const mezcla = Object.assign({}, remotas);
-            Object.entries(selections).forEach(([idx, sel]) => {
-                if (!vacio(sel)) mezcla[idx] = sel;
-            });
-            selections = mezcla;
-            const pendientes = {};
-            Object.entries(selections).forEach(([idx, sel]) => {
-                if (!remotas[idx] && !vacio(sel)) pendientes[idx] = sel;
-            });
-            if (Object.keys(pendientes).length) {
-                SB.subirTodas(pendientes, nombresPorIndice())
-                  .catch(e => console.warn('[Supabase] migración:', e.message));
-            }
-            SB.registrarVisita('selector');
-            avisoSinSeleccion();
-        } else {
-            // Polling: la nube manda (varias personas eligiendo a la vez).
-            selections = remotas;
-        }
-
-        guardarLocal();
-        pintarTodo();
-    } catch (e) {
-        console.warn('[Supabase] usando solo este dispositivo:', e.message);
-        sbDisponible = false;
-        const av = document.getElementById('avisoOffline');
-        if (av) av.style.display = 'block';
-    }
+    await sync.refresh();
 }
 
 function avisoSinSeleccion() {
@@ -189,6 +166,7 @@ function pintarConteos() {
     setTxt('btnFilter_all', `Todas (${s.visibles})`);
     TOOLS.forEach(t => setTxt('btnFilter_' + t.id, `${t.nombre} (${s[t.id]})`));
     setTxt('btnFilter_sin', `Sin Clasificar (${s.sinClasificar})`);
+    setTxt('btnFilter_selected', `Elegidas (${Object.values(selections).filter(sel => IDS.some(id => id !== 'descartada' && sel[id])).length})`);
 }
 
 /* ============================================================
@@ -300,6 +278,7 @@ function visibleEnFiltro(index) {
     const sel = selections[index] || {};
     if (currentFilter === 'all')  return sel.descartada !== true;
     if (currentFilter === 'sin')  return !IDS.some(id => sel[id]);
+    if (currentFilter === 'selected') return IDS.some(id => id !== 'descartada' && sel[id]);
     return sel[currentFilter] === true;
 }
 
@@ -341,12 +320,13 @@ function abrirModal(index) {
     const img = document.getElementById('modalImage');
     img.src = photos[index];
     img.alt = 'Foto ' + (index + 1);
-    document.getElementById('modalPhotoNumber').textContent = `Foto ${index + 1} de ${photos.length}`;
+    document.getElementById('modalPhotoNumber').textContent = `Foto ${index + 1} de ${photos.length} · ${files[index] || ''}`;
 
     const sel = selections[index] || {};
     document.querySelectorAll('.option-btn').forEach(b => {
         b.classList.toggle('selected', sel[b.dataset.category] === true);
     });
+    modalBaseline = JSON.stringify(leerModal());
 
     document.getElementById('photoModal').classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -359,7 +339,8 @@ function precargar(i) {
     const im = new Image(); im.src = photos[i];
 }
 
-function cerrarModal() {
+function cerrarModal(descartar = false) {
+    if (descartar !== true) guardarBorrador();
     document.getElementById('photoModal').classList.remove('active');
     document.body.style.overflow = '';
     modalOpen = false;
@@ -372,6 +353,14 @@ function leerModal() {
         sel[b.dataset.category] = b.classList.contains('selected');
     });
     return sel;
+}
+
+function guardarBorrador() {
+    if (currentIndex === null) return;
+    const sel = leerModal();
+    if (JSON.stringify(sel) === modalBaseline) return;
+    aplicarSeleccion(currentIndex, {...selections[currentIndex], ...sel});
+    modalBaseline = JSON.stringify(sel);
 }
 
 function aplicarSeleccion(index, sel) {
@@ -389,14 +378,14 @@ function aplicarSeleccion(index, sel) {
 
 function guardarYCerrar() {
     if (currentIndex === null) return;
-    aplicarSeleccion(currentIndex, leerModal());
+    guardarBorrador();
     cerrarModal();
-    toast('Selección guardada ✓', 'success');
+    toast('Selección registrada; revisa el estado de guardado', 'success');
 }
 
 function navegar(dir) {
     if (currentIndex === null) return;
-    aplicarSeleccion(currentIndex, leerModal());
+    guardarBorrador();
     let n = currentIndex + (dir === 'next' ? 1 : -1);
     if (n >= photos.length) n = 0;
     if (n < 0) n = photos.length - 1;
@@ -492,10 +481,16 @@ function descargarReporte() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href = url;
-    a.download = `seleccion-paula-victoria-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `seleccion-thaily-rodriguez-${new Date().toISOString().slice(0, 10)}.txt`;
     a.click();
     URL.revokeObjectURL(url);
     toast('Reporte descargado', 'success');
+}
+
+function exportarJSON() {
+    const url = URL.createObjectURL(new Blob([JSON.stringify({evento: CFG.slug, selecciones: selections, archivos: nombresPorIndice()}, null, 2)], {type:'application/json'}));
+    const a = document.createElement('a'); a.href = url; a.download = 'seleccion-thaily-rodriguez.json'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
 }
 
 function copiarResumen() {
@@ -532,14 +527,8 @@ function pintarEnlaceCompartir() {
    ============================================================ */
 async function limpiarTodo() {
     if (!confirm('¿Seguro que quieres borrar TODAS tus marcas? No se puede deshacer.')) return;
-    if (sbDisponible) {
-        try { await SB.borrarTodas(); }
-        catch (e) { console.warn('[Supabase] borrar:', e.message); }
-    }
-    selections = {};
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    pintarTodo();
-    toast('Se borraron todas las marcas', 'success');
+    Object.keys(selections).forEach(index => { delete selections[index]; sincronizarFoto(index); });
+    guardarLocal(); pintarTodo();
 }
 
 /* ============================================================
@@ -581,7 +570,7 @@ function construirPanel() {
     const filtros = document.getElementById('filterRow');
     if (filtros) {
         filtros.innerHTML =
-            `<button class="btn btn-filter active" id="btnFilter_all" data-filter="all">Todas</button>` +
+            `<button class="btn btn-filter active" id="btnFilter_all" data-filter="all">Todas</button><button class="btn btn-filter" id="btnFilter_selected" data-filter="selected">Elegidas</button>` +
             TOOLS.map(t =>
                 `<button class="btn btn-filter filter-${t.id}" id="btnFilter_${t.id}" data-filter="${t.id}">${t.nombre}</button>`
             ).join('') +
@@ -651,6 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Acciones
     document.getElementById('btnExport')?.addEventListener('click', descargarReporte);
+    document.getElementById('btnJSON')?.addEventListener('click', exportarJSON);
     document.getElementById('btnCopy')?.addEventListener('click', copiarResumen);
     document.getElementById('btnClear')?.addEventListener('click', limpiarTodo);
     document.getElementById('btnShareAlbum')?.addEventListener('click', abrirCompartir);
@@ -672,7 +662,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal de foto
     document.querySelector('.modal-close')?.addEventListener('click', cerrarModal);
-    document.getElementById('btnCancel')?.addEventListener('click', cerrarModal);
+    document.getElementById('btnCancel')?.addEventListener('click', () => cerrarModal(true));
+    document.getElementById('btnDeleteOne')?.addEventListener('click', () => {
+        if (currentIndex === null) return;
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        aplicarSeleccion(currentIndex, {}); cerrarModal(true);
+    });
     document.getElementById('btnSave')?.addEventListener('click', guardarYCerrar);
     document.getElementById('btnPrev')?.addEventListener('click', () => navegar('prev'));
     document.getElementById('btnNext')?.addEventListener('click', () => navegar('next'));
@@ -690,7 +685,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dx = e.changedTouches[0].clientX - touchStartX;
             const dy = e.changedTouches[0].clientY - touchStartY;
             if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-                dx > 0 ? swipeGuardarYSiguiente() : swipeLimpiarYSiguiente();
+                navegar(dx > 0 ? 'prev' : 'next');
             }
         }, { passive: true });
     }
@@ -721,8 +716,8 @@ window.addEventListener('scroll', () => {
     }, 300);
 }, { passive: true });
 
-document.addEventListener('visibilitychange', () => { if (document.hidden) guardarLocal(); });
-window.addEventListener('beforeunload', guardarLocal);
+document.addEventListener('visibilitychange', () => { if (document.hidden) { guardarBorrador(); guardarLocal(); } else sync?.refresh(); });
+window.addEventListener('beforeunload', () => { guardarBorrador(); guardarLocal(); });
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
 

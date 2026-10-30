@@ -32,7 +32,7 @@
         {
             icono: '↔️',
             nombre: 'Deslizar en el celular',
-            ayuda: 'Con la foto abierta: <strong>desliza a la derecha</strong> para guardar lo que marcaste y pasar a la siguiente; <strong>desliza a la izquierda</strong> para quitarle todas las marcas y avanzar. Es la forma más rápida de revisar cientos de fotos.'
+            ayuda: 'Con la foto abierta: <strong>desliza a la derecha</strong> para volver a la foto anterior; <strong>desliza a la izquierda</strong> para avanzar. Tus marcas se guardan al cambiar de foto. Para quitarlas usa «Borrar esta selección».'
         },
         {
             icono: '⌨️',
