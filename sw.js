@@ -1,7 +1,7 @@
 /* Service Worker — XV Años Thaily Rodríguez
    Shell: red primero con respaldo en caché.
    Imágenes: caché primero (las fotos no cambian). */
-const CACHE_SHELL  = 'thailyrodriguez-shell-v1';
+const CACHE_SHELL  = 'thailyrodriguez-shell-v2';
 const CACHE_IMAGES = 'thailyrodriguez-images-v1';
 
 const SHELL = [
